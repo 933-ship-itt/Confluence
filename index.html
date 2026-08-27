@@ -1,234 +1,2165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana Devnet Wallet & Balance Tracker</title>
-    <!-- Fixed Production Bundle via UNPKG CDN -->
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CONFLUENCE App Intro & Dashboard</title>
+    <!-- Import Vipnagorgialla font -->
+    <link href="https://fonts.cdnfonts.com/css/vipnagorgialla" rel="stylesheet">
     <style>
+        /* --- RESET & BASE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #121214;
+            height: 100%;
+            width: 100%;
+            background-color: #000000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #ffffff;
+            overflow: hidden;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* --- INTRO SCREEN --- */
+        .intro-container {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            background-color: #000000;
+            transition: opacity 0.5s ease;
         }
-        .container {
-            background-color: #1a1a1e;
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            text-align: center;
+
+        .intro-banner {
+            opacity: 0;
+            filter: blur(20px);
+            animation: blurInAnimation 2.5s ease-out forwards;
+            width: 85%;
+            max-width: 850px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        @keyframes blurInAnimation {
+            from {
+                opacity: 0;
+                filter: blur(20px);
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1);
+            }
+        }
+
+        /* --- DASHBOARD SCREEN --- */
+        .dashboard-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .dashboard-container.blurred {
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
+            transition: filter 0.3s ease;
+        }
+
+        /* --- SIDEBAR — FULLY ROUNDED & FOLDABLE --- */
+        .sidebar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 70px;
+            height: calc(100% - 40px);
+            z-index: 100;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 40px;
+            overflow: hidden;
+            background-color: #181818;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 20px 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .sidebar:hover {
+            width: 260px;
+        }
+
+        .sidebar:hover .sidebar-inner {
+            background-color: #2a2a2a;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.06), 0 10px 30px rgba(0, 0, 0, 0.9);
+        }
+
+        /* --- SIDEBAR HEADER --- */
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0 16px;
+            box-sizing: border-box;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .brand-logo {
+            width: 35px;
+            height: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+            transition: filter 0.3s ease;
+        }
+
+        .brand-title-img {
+            margin-left: 12px;
+            height: 24px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0;
+            white-space: nowrap;
+            transition: opacity 0.25s ease 0.1s, filter 0.3s ease;
+        }
+
+        .sidebar:hover .brand-title-img {
+            opacity: 1;
+        }
+
+        .sidebar:hover .brand-logo,
+        .sidebar:hover .brand-title-img {
+            filter: brightness(1.2);
+        }
+
+        /* --- SIDEBAR DIVIDER --- */
+        .sidebar-divider {
+            width: calc(100% - 32px);
+            margin: 12px 16px 14px 16px;
+            height: 1px;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.05));
+            border-radius: 2px;
+            flex-shrink: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        /* --- SIDEBAR NAVIGATION --- */
+        .sidebar-nav {
+            width: 100%;
+            padding: 0 12px;
+            box-sizing: border-box;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-spacer {
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 14px;
+            color: #9a9a9a;
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            cursor: pointer;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .nav-item .nav-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            color: #9a9a9a;
+            transition: color 0.2s ease;
+        }
+
+        .nav-item .nav-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        .nav-item .nav-text {
+            margin-left: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.2s ease 0.1s, color 0.2s ease;
+            color: #cccccc;
+        }
+
+        .sidebar:hover .nav-item .nav-text {
+            opacity: 1;
+        }
+
+        .nav-item.active .nav-text {
+            background: linear-gradient(to right, #4A90E2, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-item.active .nav-icon {
+            color: #5B9BF5;
+        }
+
+        .nav-item.active {
+            background-color: rgba(75, 140, 255, 0.12);
+        }
+
+        .nav-item:hover {
+            background-color: #3d3d3d;
+            color: #ffffff;
+        }
+
+        .nav-item:hover .nav-icon {
+            color: #ffffff;
+        }
+
+        /* --- DASHBOARD CONTENT --- */
+        .dashboard-content {
+            margin-left: 110px;
+            padding: 30px 40px;
+            height: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            transition: filter 0.35s ease;
+            filter: blur(0px);
+        }
+
+        .sidebar:hover~.dashboard-content {
+            filter: blur(6px);
+        }
+
+        /* --- TOP BAR (SEARCH + RIGHT ACTIONS) --- */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 20px;
+            margin-bottom: 24px;
+            flex-shrink: 0;
+        }
+
+        /* SEARCH BAR */
+        .search-bar {
+            display: flex;
+            align-items: center;
             width: 100%;
             max-width: 400px;
-            border: 1px solid #2a2a30;
+            background-color: #1e1e1e;
+            border-radius: 40px;
+            padding: 8px 18px;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
         }
-        h2 { margin-bottom: 0.5rem; font-weight: 600; }
-        .network-badge {
-            display: inline-block;
-            background-color: rgba(244, 67, 54, 0.15);
-            color: #f44336;
-            border: 1px solid #f44336;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: bold;
-            border-radius: 20px;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
+
+        .search-bar .search-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888888;
+            flex-shrink: 0;
         }
-        .btn {
-            background-color: #512da8;
-            color: white;
+
+        .search-bar .search-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            background: transparent;
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 100%;
+            outline: none;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 400;
+            padding: 4px 0;
+            font-family: inherit;
         }
-        .btn:hover { background-color: #673ab7; transform: translateY(-1px); }
-        .btn:disabled { background-color: #3a3a40; color: #7a7a80; cursor: not-allowed; transform: none; }
-        .btn-disconnect {
-            background-color: transparent;
-            color: #ef5350;
-            border: 1px solid #ef5350;
-            margin-top: 10px;
+
+        .search-bar input::placeholder {
+            color: #6b6b6b;
         }
-        .btn-disconnect:hover { background-color: rgba(239, 83, 80, 0.1); }
-        .status-box {
-            margin-top: 1.5rem;
-            padding: 16px;
-            border-radius: 8px;
+
+        .search-bar .shortcut-hint {
+            color: #4a4a4a;
+            font-size: 12px;
+            background: #2a2a2a;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        /* TOP RIGHT CONTROLS */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #2e2e2e;
+            border-radius: 30px;
+            padding: 8px 16px;
             font-size: 14px;
-            word-break: break-all;
-            display: none;
-            text-align: left;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
-        .success { background-color: rgba(76, 175, 80, 0.05); color: #ffffff; border: 1px solid #4caf50; }
-        .info { background-color: rgba(33, 150, 243, 0.1); color: #2196f3; border: 1px solid #2196f3; text-align: center; }
-        .balance-item {
+
+        .btn-action:hover {
+            background-color: #2a2a2a;
+            border-color: #444444;
+        }
+
+        .btn-action svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        /* Wallet Balance Badge */
+        .wallet-balance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 30px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #10B981;
+        }
+
+        .wallet-balance-badge svg {
+            width: 18px;
+            height: 18px;
+            stroke: #10B981;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* Profile Button */
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #1e1e1e;
+            border: 1px solid #2e2e2e;
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            position: relative;
+        }
+
+        .profile-btn:hover {
+            background-color: #2a2a2a;
+            border-color: #555555;
+        }
+
+        .profile-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+            stroke: currentColor;
+            fill: none;
+        }
+
+        /* Profile Popover / Dropdown */
+        .profile-popover {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 280px;
+            background-color: #161616;
+            border: 1px solid #2a2a2a;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 200;
+        }
+
+        .profile-popover.show {
+            display: flex;
+        }
+
+        .popover-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: #888888;
+            border-bottom: 1px solid #222222;
+            padding-bottom: 8px;
+        }
+
+        .popover-balance-row {
             display: flex;
             justify-content: space-between;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px solid #2a2a30;
-            font-size: 15px;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
         }
-        .balance-value { font-weight: bold; color: #4caf50; }
-        .hidden { display: none !important; }
+
+        .popover-balance-row span:last-child {
+            color: #10B981;
+            font-weight: 700;
+        }
+
+        /* --- STYLED TABS / HEADERS --- */
+        .dashboard-tabs {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 4px 0;
+            font-family: 'Vipnagorgialla', 'Segoe UI', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            position: relative;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.45;
+            transition: opacity 0.25s ease, transform 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 1;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #0052D4, #6FB1FC);
+            border-radius: 2px;
+        }
+
+        .tab-btn:hover:not(.active) {
+            opacity: 0.85;
+        }
+
+        /* --- SUBSECTION HEADER --- */
+        .subsection-header {
+            font-family: 'Vipnagorgialla', 'Segoe UI', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #888888;
+            letter-spacing: 0.8px;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        /* --- WORKSPACE & HORIZONTAL SCROLLABLE CARDS --- */
+        .workspace-content {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            color: #4a4a4a;
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            border: none;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .tab-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        .tab-view.active-view {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            overflow-y: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .tab-view.active-view::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Cards Row Container (Hide Scrollbar) */
+        .cards-row-container {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            flex-shrink: 0;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .cards-row-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Individual Card - Unframed top half */
+        .card {
+            width: 250px;
+            min-width: 250px;
+            flex-shrink: 0;
+            background-color: #121212;
+            border: 1px solid #222222;
+            border-radius: 16px;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: #333333;
+            transform: translateY(-2px);
+        }
+
+        /* 5:3 Ratio Flush Edge-to-Edge Loading Area */
+        .card-frame {
+            width: 100%;
+            aspect-ratio: 5 / 3;
+            background: linear-gradient(90deg, #181818 25%, #2a2a2a 50%, #181818 75%);
+            background-size: 200% 100%;
+            animation: loadingGradient 1.5s infinite;
+        }
+
+        @keyframes loadingGradient {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Card Content Details */
+        .card-details {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .card-meta-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-ticker {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .card-mc {
+            font-size: 13px;
+            font-weight: 700;
+            color: #10B981;
+        }
+
+        .card-creator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #9a9a9a;
+            font-size: 12px;
+        }
+
+        .creator-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #2e2e2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .creator-icon svg {
+            width: 10px;
+            height: 10px;
+            stroke: #888888;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* Metadata Fineprint with Purple-Pink Gradient */
+        .card-description {
+            font-size: 12px;
+            line-height: 1.4;
+            background: linear-gradient(135deg, #c084fc 0%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .btn-read-more {
+            background: none;
+            border: none;
+            background: linear-gradient(135deg, #c084fc 0%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 2px;
+            transition: opacity 0.2s ease;
+            text-decoration: underline;
+            text-decoration-color: #f472b6;
+        }
+
+        .btn-read-more:hover {
+            opacity: 0.8;
+        }
+
+        /* --- FAKE TAB LOADING SPINNER --- */
+        .tab-loader {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: #4364F7;
+        }
+
+        .tab-loader.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(67, 100, 247, 0.15);
+            border-top: 3px solid #4364F7;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- INDEX REGULARS SECTION --- */
+        .index-regulars-wrapper {
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-start;
+            flex-shrink: 0;
+            padding-bottom: 24px;
+        }
+
+        .index-regulars-inner {
+            width: 100%;
+        }
+
+        /* 5 Column Downward Grid Layout */
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            width: 100%;
+        }
+
+        .index-card {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        /* 1:1 Square Frame */
+        .index-card-frame {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #181818 25%, #2a2a2a 50%, #181818 75%);
+            background-size: 200% 100%;
+            animation: loadingGradient 1.5s infinite;
+            border: 1px solid #222222;
+        }
+
+        /* --- NEW INDEX CARD METADATA STYLES --- */
+        .index-card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding-top: 2px;
+        }
+
+        .index-token-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            line-height: 1.2;
+        }
+
+        .index-ticker {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6e7681;
+        }
+
+        .index-mc-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 3px 0;
+        }
+
+        .index-mc-badge {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 2px 6px;
+            border-radius: 5px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .index-mc-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6e7681;
+        }
+
+        .index-creator-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #8b949e;
+            margin-top: 1px;
+        }
+
+        .index-creator-avatar {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .index-creator-avatar svg {
+            width: 10px;
+            height: 10px;
+            stroke: #181818;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .index-creator-name {
+            font-size: 13px;
+            color: #8b949e;
+            font-weight: 400;
+        }
+
+        .index-age-wrap {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #10B981;
+            margin-left: 2px;
+        }
+
+        .seed-icon-svg {
+            width: 13px;
+            height: 13px;
+            stroke: #10B981;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .index-meta-footer {
+            font-size: 12px;
+            color: #444444;
+            margin-top: 1px;
+        }
+
+        /* --- WALLET CONNECT MODAL & 5:3 FRAME OVERLAY --- */
+        .wallet-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wallet-modal-overlay.show {
+            display: flex;
+        }
+
+        .wallet-modal-frame {
+            width: 100%;
+            max-width: 540px;
+            aspect-ratio: 5 / 3;
+            background-color: #141414;
+            border: 1px solid #2a2a2a;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .wallet-modal-title {
+            font-family: 'Vipnagorgialla', 'Segoe UI', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0052D4 0%, #6FB1FC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .wallet-modal-body {
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: #b0b0b0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .wallet-modal-body p strong {
+            color: #ffffff;
+        }
+
+        .wallet-disclaimer {
+            font-size: 11.5px;
+            color: #888888;
+            background-color: #1a1a1a;
+            border: 1px solid #262626;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .wallet-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-modal-cancel {
+            background: transparent;
+            border: 1px solid #333333;
+            color: #aaaaaa;
+            border-radius: 30px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-cancel:hover {
+            background: #222222;
+            color: #ffffff;
+        }
+
+        .btn-modal-primary {
+            background: linear-gradient(135deg, #0052D4 0%, #4364F7 100%);
+            border: none;
+            color: #ffffff;
+            border-radius: 30px;
+            padding: 8px 22px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-modal-primary:hover {
+            opacity: 0.9;
+        }
+
+        /* Scanner & Wallet Selection Module */
+        .wallet-scanner-content, .wallet-list-content {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        .scanner-loader-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            gap: 16px;
+            color: #4364F7;
+        }
+
+        .wallet-options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+            flex: 1;
+            margin: 10px 0;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .wallet-options-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .wallet-option-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #1c1c1c;
+            border: 1px solid #2a2a2a;
+            border-radius: 14px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .wallet-option-item:hover {
+            border-color: #4364F7;
+            background-color: #222222;
+        }
+
+        .wallet-option-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .wallet-option-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #333333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .wallet-option-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .wallet-detected-badge {
+            font-size: 11px;
+            font-weight: 600;
+            color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2 id="title">Wallet Connection</h2>
-        <div class="network-badge">Solana Devnet</div>
-        <button id="connectBtn" class="btn">Detect & Connect Wallet</button>
-        <button id="disconnectBtn" class="btn btn-disconnect hidden">Disconnect</button>
-        <div id="status" class="status-box"></div>
+    <!-- INTRO VIEW -->
+    <div class="intro-container" id="introScreen">
+        <img src="https://i.postimg.cc/k4qhYNX4/Gemini-Generated-Image-v32hgqv32hgqv32h.jpg" alt="CONFLUENCE Banner" class="intro-banner">
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div class="dashboard-container" id="dashboardScreen">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-inner">
+                <!-- Branding -->
+                <div class="sidebar-header">
+                    <img src="https://i.postimg.cc/qRWCQrTx/Screenshot-2026-08-27-092413-removebg-preview.png" alt="CONFLUENCE Icon" class="brand-logo">
+                    <img src="https://i.postimg.cc/FKQWCth6/image-removebg-preview-(1).png" alt="CONFLUENCE Name" class="brand-title-img">
+                </div>
+
+                <!-- Divider -->
+                <div class="sidebar-divider"></div>
+
+                <!-- Navigation -->
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
+                            </svg>
+                        </span>
+                        <span class="nav-text">Home</span>
+                    </a>
+
+                    <a href="#" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                            </svg>
+                        </span>
+                        <span class="nav-text">Explore</span>
+                    </a>
+
+                    <a href="#" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 20L18 20" />
+                                <path d="M12 4L12 16" />
+                                <path d="M8 12L8 16" />
+                                <path d="M16 8L16 16" />
+                            </svg>
+                        </span>
+                        <span class="nav-text">Leaderboard</span>
+                    </a>
+
+                    <div class="nav-spacer"></div>
+
+                    <a href="#" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                        </span>
+                        <span class="nav-text">Portfolio</span>
+                    </a>
+
+                    <a href="#" class="nav-item">
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+                            </svg>
+                        </span>
+                        <span class="nav-text">Settings</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="dashboard-content">
+            <!-- Top Bar Section -->
+            <div class="top-bar">
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <span class="search-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </span>
+                    <input type="text" placeholder="Search for tokens, wallets..." />
+                    <span class="shortcut-hint">⌘K</span>
+                </div>
+
+                <!-- Header Actions (Top Right) -->
+                <div class="header-actions">
+                    <!-- Wallet Connect Button -->
+                    <button class="btn-action" id="connectWalletBtn">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                            <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                            <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
+                        </svg>
+                        <span id="connectWalletBtnText">Connect Wallet</span>
+                    </button>
+
+                    <!-- Wallet Balance Badge -->
+                    <div class="wallet-balance-badge" id="walletBalanceBadge">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="8" />
+                            <line x1="12" y1="8" x2="12" y2="16" />
+                            <path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2.5-2.5 2.5s-2.5 1-2.5 2.5a2.5 2.5 0 0 0 5 0" />
+                        </svg>
+                        <span id="badgeBalanceText">$0</span>
+                    </div>
+
+                    <!-- Create Button -->
+                    <button class="btn-action">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        <span>Create</span>
+                    </button>
+
+                    <!-- Profile Icon Template -->
+                    <button class="profile-btn" id="profileBtn" aria-label="Profile">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+
+                        <!-- Profile Popover -->
+                        <div class="profile-popover" id="profilePopover">
+                            <div class="popover-header" id="popoverWalletAddress">Not Connected</div>
+                            <div class="popover-balance-row">
+                                <span>SOL Balance:</span>
+                                <span id="popoverSolBalance">0.00 SOL</span>
+                            </div>
+                            <div class="popover-balance-row">
+                                <span>USDC Balance:</span>
+                                <span id="popoverUsdcBalance">0.00 USDC</span>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Board, Portfolio, and Inbox Tabs -->
+            <div class="dashboard-tabs">
+                <button class="tab-btn active" id="btnBoard" onclick="switchMainTab('board')">Board</button>
+                <button class="tab-btn" id="btnPortfolio" onclick="switchMainTab('portfolio')">Portfolio</button>
+                <button class="tab-btn" id="btnInbox" onclick="switchMainTab('inbox')">Inbox</button>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="workspace-content">
+                <!-- Fake Loading Screen overlay -->
+                <div id="tabLoader" class="tab-loader">
+                    <div class="spinner"></div>
+                </div>
+
+                <!-- Tab Views -->
+                <div id="viewBoard" class="tab-view active-view">
+                    <div class="subsection-header">Speculative Blue-Chips</div>
+
+                    <!-- Horizontally Scrollable Cards Container -->
+                    <div class="cards-row-container" id="cardsRow">
+                        <!-- Card 1 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$SPEC</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_01</span>
+                                </div>
+                                <p class="card-description">
+                                    Sample asset overview details and metrics ending with....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$BLUE</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_02</span>
+                                </div>
+                                <p class="card-description">
+                                    Early stage decentralized protocol parameters....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$ALPHA</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_03</span>
+                                </div>
+                                <p class="card-description">
+                                    Community backed liquidity pool metadata....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$CHIP</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_04</span>
+                                </div>
+                                <p class="card-description">
+                                    Experimental automated trading curve strategy....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 5 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$NEXUS</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_05</span>
+                                </div>
+                                <p class="card-description">
+                                    Cross-chain smart contract integration update....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== INDEX REGULARS SECTION ===== -->
+                    <div class="index-regulars-wrapper">
+                        <div class="index-regulars-inner">
+                            <div class="subsection-header">Index Regulars</div>
+
+                            <!-- 15 Items Total (3 Rows of 5) -->
+                            <div class="index-grid">
+                                <!-- Row 1 (Items 1-5) -->
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">AIM HIGH</div>
+                                        <div class="index-ticker">$HIGH</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$10.7K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">tanlobster</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                1m
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">VORTEX NETWORK</div>
+                                        <div class="index-ticker">$VORTEX</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$450K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">creator_02</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                5h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">HELIOS CHAIN</div>
+                                        <div class="index-ticker">$HELIOS</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$890K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">creator_03</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                1d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">QUANTUM AI</div>
+                                        <div class="index-ticker">$QAI</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$310K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">creator_04</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                3d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">SOLANA ECO</div>
+                                        <div class="index-ticker">$SOLECO</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$2.4M</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">creator_05</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                4d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <!-- Row 2 (Items 6-10) -->
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">NEON PULSE</div>
+                                        <div class="index-ticker">$PULSE</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$75.2K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">neonrider</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                12h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">APEX PROTOCOL</div>
+                                        <div class="index-ticker">$APEX</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$1.2M</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">apexuser</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                2d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">CYBER PUNK</div>
+                                        <div class="index-ticker">$CYBER</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$95.4K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">glitch</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                6h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">STRATOSPHERE</div>
+                                        <div class="index-ticker">$STRAT</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$520K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">skywalker</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                5d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">NEXUS PRIME</div>
+                                        <div class="index-ticker">$PRIME</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$330K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">matrix</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                3h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <!-- Row 3 (Items 11-15) -->
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">TITAN YIELD</div>
+                                        <div class="index-ticker">$TITAN</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$680K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">colossus</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                4d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">ECHO VALLEY</div>
+                                        <div class="index-ticker">$ECHO</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$42.1K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">sonorous</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                30m
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">NEXUS LABS</div>
+                                        <div class="index-ticker">$LABS</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$1.5M</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">scientist</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                7d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">SOLARIS TOKEN</div>
+                                        <div class="index-ticker">$SOLAR</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$190K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">helios_dev</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                18h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">INFINITY POOL</div>
+                                        <div class="index-ticker">$POOL</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$910K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">infinity</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                6d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ===== END INDEX REGULARS ===== -->
+
+                </div>
+
+                <!-- PORTFOLIO VIEW IMPLEMENTATION -->
+                <div id="viewPortfolio" class="tab-view">
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: #121212; border: 1px solid #222222; border-radius: 16px; padding: 24px;">
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #888888; font-weight: 600;">Total Portfolio Value</span>
+                            <span style="font-family: 'Vipnagorgialla', sans-serif; font-size: 38px; font-weight: 700; color: #10B981;" id="portfolioTotalVal">$0</span>
+                        </div>
+                        <button class="btn-action portfolioConnectBtn" style="background: linear-gradient(135deg, #0052D4 0%, #4364F7 100%); border: none; padding: 12px 24px; font-weight: 600; cursor: pointer;">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
+                                <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                                <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                                <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
+                            </svg>
+                            <span>Connect Wallet</span>
+                        </button>
+                    </div>
+
+                    <div class="subsection-header">Owned Assets</div>
+
+                    <!-- Exact Index Cards Grid representing Owned Assets -->
+                    <div class="index-grid" style="padding-bottom: 24px;">
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">AIM HIGH</div>
+                                <div class="index-ticker">$HIGH</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$10.7K</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">tanlobster</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        1m
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
+                            </div>
+                        </div>
+
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">VORTEX NETWORK</div>
+                                <div class="index-ticker">$VORTEX</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$450K</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">creator_02</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        5h
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
+                            </div>
+                        </div>
+
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">HELIOS CHAIN</div>
+                                <div class="index-ticker">$HELIOS</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$890K</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">creator_03</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        1d
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
+                            </div>
+                        </div>
+
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">QUANTUM AI</div>
+                                <div class="index-ticker">$QAI</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$310K</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">creator_04</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        3d
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
+                            </div>
+                        </div>
+
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">SOLANA ECO</div>
+                                <div class="index-ticker">$SOLECO</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$2.4M</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">creator_05</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        4d
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="viewInbox" class="tab-view">
+                    <span>📬 Inbox feature is under development</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- WALLET CONNECT MODAL OVERLAY -->
+    <div class="wallet-modal-overlay" id="walletModalOverlay">
+        <div class="wallet-modal-frame" id="walletModalFrame">
+            <!-- Step 1: Explanation & Security Notice -->
+            <div id="walletStep1" style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+                <div>
+                    <div class="wallet-modal-title">Secure Wallet Connection</div>
+                    <div class="wallet-modal-body" style="margin-top: 10px;">
+                        <p><strong>How Wallet Connect Works:</strong> Confluence securely bridges with your browser extension via decentralized cryptographic protocols to authenticate your identity and display your Solana-based portfolio assets.</p>
+                        <div class="wallet-disclaimer">
+                            🔒 <strong>Privacy & Liability:</strong> We never store, request, or access your mnemonics, private keys, or personal account data. Confluence is fully non-custodial and is not liable for any lost funds or unauthorized external transactions related to your wallet account.
+                        </div>
+                    </div>
+                </div>
+                <div class="wallet-modal-footer">
+                    <button class="btn-modal-cancel" id="cancelWalletModal">Cancel</button>
+                    <button class="btn-modal-primary" id="understoodWalletBtn">Understood</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Scanner / Loading state -->
+            <div class="wallet-scanner-content" id="walletStep2">
+                <div class="wallet-modal-title">Scanning Extensions</div>
+                <div class="scanner-loader-wrap">
+                    <div class="spinner" style="width: 42px; height: 42px;"></div>
+                    <span style="font-size: 14px; color: #a0a0a0; font-weight: 500;">Scanning browser extensions for active Solana wallets...</span>
+                </div>
+                <div class="wallet-modal-footer">
+                    <button class="btn-modal-cancel" onclick="closeWalletModal()">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Solana Wallet Selector Module -->
+            <div class="wallet-list-content" id="walletStep3">
+                <div class="wallet-modal-title">Select Solana Web3 Wallet</div>
+                <div class="wallet-options-list">
+                    <div class="wallet-option-item" onclick="selectSolanaWallet('Phantom', '5.42 SOL', '1420.50 USDC')">
+                        <div class="wallet-option-info">
+                            <div class="wallet-option-icon" style="background: #ab9ff2; color: #141414;">P</div>
+                            <div>
+                                <div class="wallet-option-name">Phantom</div>
+                                <div style="font-size: 11px; color: #777;">Solana browser extension</div>
+                            </div>
+                        </div>
+                        <span class="wallet-detected-badge">Detected</span>
+                    </div>
+
+                    <div class="wallet-option-item" onclick="selectSolanaWallet('Solflare', '1.85 SOL', '430.00 USDC')">
+                        <div class="wallet-option-info">
+                            <div class="wallet-option-icon" style="background: #fc7233; color: #fff;">S</div>
+                            <div>
+                                <div class="wallet-option-name">Solflare</div>
+                                <div style="font-size: 11px; color: #777;">Solana browser extension</div>
+                            </div>
+                        </div>
+                        <span class="wallet-detected-badge">Detected</span>
+                    </div>
+
+                    <div class="wallet-option-item" onclick="selectSolanaWallet('Backpack', '0.50 SOL', '85.20 USDC')">
+                        <div class="wallet-option-info">
+                            <div class="wallet-option-icon" style="background: #00d2ff; color: #141414;">B</div>
+                            <div>
+                                <div class="wallet-option-name">Backpack</div>
+                                <div style="font-size: 11px; color: #777;">Solana browser extension</div>
+                            </div>
+                        </div>
+                        <span class="wallet-detected-badge">Detected</span>
+                    </div>
+                </div>
+                <div class="wallet-modal-footer">
+                    <button class="btn-modal-cancel" onclick="closeWalletModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        const connectBtn = document.getElementById('connectBtn');
-        const disconnectBtn = document.getElementById('disconnectBtn');
-        const statusBox = document.getElementById('status');
-        const title = document.getElementById('title');
+        // Intro Screen Timer
+        setTimeout(() => {
+            const intro = document.getElementById('introScreen');
+            const dashboard = document.getElementById('dashboardScreen');
 
-        // TO THIS:
-const DEVNET_USDC_MINT = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
-        let connection;
+            intro.style.opacity = '0';
 
-        // Initialize connection safely after checking dependency presence
-        if (typeof solanaWeb3 !== 'undefined') {
-            connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
-        } else {
-            console.error("Critical: solanaWeb3 SDK failed to load from CDN.");
+            setTimeout(() => {
+                intro.style.display = 'none';
+                dashboard.style.display = 'block';
+            }, 500);
+
+        }, 3500);
+
+        // Tab Switcher with Fake Loading Screen
+        let isSwitching = false;
+
+        function switchMainTab(targetTab) {
+            if (isSwitching) return;
+
+            const tabs = ['board', 'portfolio', 'inbox'];
+            const targetBtnId = 'btn' + targetTab.charAt(0).toUpperCase() + targetTab.slice(1);
+            const targetViewId = 'view' + targetTab.charAt(0).toUpperCase() + targetTab.slice(1);
+
+            const activeBtn = document.getElementById(targetBtnId);
+            const activeView = document.getElementById(targetViewId);
+            const loader = document.getElementById('tabLoader');
+
+            if (activeBtn.classList.contains('active')) return;
+
+            isSwitching = true;
+
+            tabs.forEach(tab => {
+                const bId = 'btn' + tab.charAt(0).toUpperCase() + tab.slice(1);
+                const vId = 'view' + tab.charAt(0).toUpperCase() + tab.slice(1);
+                document.getElementById(bId).classList.remove('active');
+                document.getElementById(vId).classList.remove('active-view');
+            });
+
+            activeBtn.classList.add('active');
+            loader.classList.add('show');
+
+            setTimeout(() => {
+                loader.classList.remove('show');
+                activeView.classList.add('active-view');
+                isSwitching = false;
+            }, 450);
         }
 
-        function getProvider() {
-            if ('solana' in window) {
-                const provider = window.solana;
-                if (provider.isPhantom || provider) return provider;
-            }
-            if (window.solflare) return window.solflare;
-            return null;
+        // --- WALLET CONNECT FUNCTIONALITY & STATE PERSISTENCE ---
+        const connectBtn = document.getElementById('connectWalletBtn');
+        const connectBtnText = document.getElementById('connectWalletBtnText');
+        const portfolioConnectBtns = document.querySelectorAll('.portfolioConnectBtn');
+        const walletModalOverlay = document.getElementById('walletModalOverlay');
+        const dashboardScreen = document.getElementById('dashboardScreen');
+        const cancelWalletModalBtn = document.getElementById('cancelWalletModal');
+        const understoodWalletBtn = document.getElementById('understoodWalletBtn');
+
+        const walletStep1 = document.getElementById('walletStep1');
+        const walletStep2 = document.getElementById('walletStep2');
+        const walletStep3 = document.getElementById('walletStep3');
+
+        const badgeBalanceText = document.getElementById('badgeBalanceText');
+        const portfolioTotalVal = document.getElementById('portfolioTotalVal');
+        const profileBtn = document.getElementById('profileBtn');
+        const profilePopover = document.getElementById('profilePopover');
+        const popoverWalletAddress = document.getElementById('popoverWalletAddress');
+        const popoverSolBalance = document.getElementById('popoverSolBalance');
+        const popoverUsdcBalance = document.getElementById('popoverUsdcBalance');
+
+        // Open Modal Handler
+        function openWalletModal() {
+            walletStep1.style.display = 'flex';
+            walletStep2.style.display = 'none';
+            walletStep3.style.display = 'none';
+            walletModalOverlay.classList.add('show');
+            dashboardScreen.classList.add('blurred');
         }
 
-        async function fetchBalances(publicKeyString) {
-            if (!connection) return { sol: "SDK Error", usdc: "SDK Error" };
-            try {
-                const pubKey = new solanaWeb3.PublicKey(publicKeyString);
+        function closeWalletModal() {
+            walletModalOverlay.classList.remove('show');
+            dashboardScreen.classList.remove('blurred');
+        }
 
-                const lamports = await connection.getBalance(pubKey);
-                const solBalance = lamports / solanaWeb3.LAMPORTS_PER_SOL;
+        connectBtn.addEventListener('click', openWalletModal);
+        portfolioConnectBtns.forEach(btn => btn.addEventListener('click', openWalletModal));
+        cancelWalletModalBtn.addEventListener('click', closeWalletModal);
 
-                let usdcBalance = "0.00";
+        // Understood clicked -> Blur & Deactivate background, show loader and scan
+        understoodWalletBtn.addEventListener('click', () => {
+            walletStep1.style.display = 'none';
+            walletStep2.style.display = 'flex';
+
+            setTimeout(() => {
+                walletStep2.style.display = 'none';
+                walletStep3.style.display = 'flex';
+            }, 1200);
+        });
+
+        // Select Solana Wallet handler
+        function selectSolanaWallet(walletName, solVal, usdcVal) {
+            const walletData = {
+                name: walletName,
+                address: '7xKX...3m2p (' + walletName + ')',
+                sol: solVal,
+                usdc: usdcVal,
+                totalUSD: '$' + (parseFloat(solVal) * 180 + parseFloat(usdcVal)).toFixed(2)
+            };
+
+            localStorage.setItem('confluence_connected_wallet', JSON.stringify(walletData));
+            applyWalletSession(walletData);
+            closeWalletModal();
+        }
+
+        // Apply active wallet session to UI
+        function applyWalletSession(data) {
+            connectBtnText.textContent = data.name + ' Connected';
+            badgeBalanceText.textContent = data.totalUSD;
+            portfolioTotalVal.textContent = data.totalUSD;
+            popoverWalletAddress.textContent = data.address;
+            popoverSolBalance.textContent = data.sol;
+            popoverUsdcBalance.textContent = data.usdc;
+
+            portfolioConnectBtns.forEach(btn => {
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
+                        <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                        <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                        <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
+                    </svg>
+                    <span>${data.name} Connected</span>
+                `;
+            });
+        }
+
+        // Profile Popover Toggle
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profilePopover.classList.toggle('show');
+        });
+
+        document.addEventListener('click', () => {
+            profilePopover.classList.remove('show');
+        });
+
+        // Check LocalStorage on initial load for auto-connect
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedWallet = localStorage.getItem('confluence_connected_wallet');
+            if (savedWallet) {
                 try {
-                    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(pubKey, {
-                        mint: new solanaWeb3.PublicKey(DEVNET_USDC_MINT)
-                    });
-
-                    if (tokenAccounts.value.length > 0) {
-                        const amountInfo = tokenAccounts.value[0].account.data.parsed.info.tokenAmount;
-                        usdcBalance = amountInfo.uiAmountString;
-                    }
-                } catch (tokenErr) {
-                    console.error("Token Account lookup bypassed:", tokenErr);
+                    const parsedData = JSON.parse(savedWallet);
+                    applyWalletSession(parsedData);
+                } catch (e) {
+                    console.error('Error parsing saved wallet', e);
                 }
-
-                return { sol: solBalance.toFixed(4), usdc: usdcBalance };
-            } catch (err) {
-                console.error("Blockchain RPC Fetch error:", err);
-                return { sol: "Error", usdc: "Error" };
-            }
-        }
-
-        async function updateUIConnected(publicKey) {
-            const shortAddress = `${publicKey.substring(0, 4)}...${publicKey.substring(publicKey.length - 4)}`;
-            title.innerText = "Wallet Active";
-            
-            statusBox.className = "status-box success";
-            statusBox.style.display = "block";
-            statusBox.innerHTML = `<strong>🟢 Connected:</strong> ${shortAddress}<br><br><i>Loading balances...</i>`;
-            
-            connectBtn.innerText = "Wallet Connected";
-            connectBtn.disabled = true;
-            disconnectBtn.classList.remove('hidden');
-
-            const balances = await fetchBalances(publicKey);
-            statusBox.innerHTML = `
-                <strong>🟢 Connected:</strong> ${shortAddress}
-                <div class="balance-item" style="margin-top: 15px;">
-                    <span>SOL Balance:</span>
-                    <span class="balance-value">${balances.sol} SOL</span>
-                </div>
-                <div class="balance-item">
-                    <span>USDC Balance:</span>
-                    <span class="balance-value">$${balances.usdc}</span>
-                </div>
-            `;
-        }
-
-        function updateUIDisconnected() {
-            title.innerText = "Wallet Connection";
-            statusBox.style.display = "none";
-            connectBtn.innerText = "Detect & Connect Wallet";
-            connectBtn.disabled = false;
-            disconnectBtn.classList.add('hidden');
-        }
-
-        async function connectWallet(e, isAutoConnect = false) {
-            const provider = getProvider();
-
-            if (!provider) {
-                statusBox.className = "status-box info";
-                statusBox.style.display = "block";
-                statusBox.innerHTML = "❌ No extension wallet detected. Please install Phantom or Solflare.";
-                return;
-            }
-
-            try {
-                const resp = await provider.connect(isAutoConnect ? { onlyIfTrusted: true } : {});
-                const pubKey = resp.publicKey ? resp.publicKey.toString() : provider.publicKey?.toString();
-                
-                if (pubKey) {
-                    localStorage.setItem('wallet_connected_flag', 'true');
-                    await updateUIConnected(pubKey);
-                }
-            } catch (err) {
-                if (!isAutoConnect) {
-                    statusBox.className = "status-box info";
-                    statusBox.style.display = "block";
-                    statusBox.innerText = `Connection error: ${err.message}`;
-                }
-                console.warn("Handshake processed:", err.message);
-            }
-        }
-
-        async function disconnectWallet() {
-            const provider = getProvider();
-            if (provider && provider.disconnect) {
-                await provider.disconnect();
-            }
-            localStorage.removeItem('wallet_connected_flag');
-            updateUIDisconnected();
-        }
-
-        connectBtn.addEventListener('click', (e) => connectWallet(e, false));
-        disconnectBtn.addEventListener('click', disconnectWallet);
-
-        window.addEventListener('load', () => {
-            const wasConnected = localStorage.getItem('wallet_connected_flag');
-            if (wasConnected === 'true') {
-                connectWallet(null, true);
             }
         });
     </script>
+
 </body>
 </html>
