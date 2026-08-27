@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robust Wallet Connection</title>
+    <title>Solana Devnet Wallet & Balance Tracker</title>
+    <!-- Official Solana Web3.js Production Bundle via CDN -->
+    <script src="https://unpkg.com"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -25,7 +27,19 @@
             max-width: 400px;
             border: 1px solid #2a2a30;
         }
-        h2 { margin-bottom: 1.5rem; font-weight: 600; }
+        h2 { margin-bottom: 0.5rem; font-weight: 600; }
+        .network-badge {
+            display: inline-block;
+            background-color: rgba(244, 67, 54, 0.15);
+            color: #f44336;
+            border: 1px solid #f44336;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+        }
         .btn {
             background-color: #512da8;
             color: white;
@@ -49,14 +63,24 @@
         .btn-disconnect:hover { background-color: rgba(239, 83, 80, 0.1); }
         .status-box {
             margin-top: 1.5rem;
-            padding: 12px;
+            padding: 16px;
             border-radius: 8px;
             font-size: 14px;
             word-break: break-all;
             display: none;
+            text-align: left;
         }
-        .success { background-color: rgba(76, 175, 80, 0.1); color: #4caf50; border: 1px solid #4caf50; }
-        .info { background-color: rgba(33, 150, 243, 0.1); color: #2196f3; border: 1px solid #2196f3; }
+        .success { background-color: rgba(76, 175, 80, 0.05); color: #ffffff; border: 1px solid #4caf50; }
+        .info { background-color: rgba(33, 150, 243, 0.1); color: #2196f3; border: 1px solid #2196f3; text-align: center; }
+        .balance-item {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #2a2a30;
+            font-size: 15px;
+        }
+        .balance-value { font-weight: bold; color: #4caf50; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -64,6 +88,7 @@
 
     <div class="container">
         <h2 id="title">Wallet Connection</h2>
+        <div class="network-badge">Solana Devnet</div>
         <button id="connectBtn" class="btn">Detect & Connect Wallet</button>
         <button id="disconnectBtn" class="btn btn-disconnect hidden">Disconnect</button>
         <div id="status" class="status-box"></div>
@@ -75,30 +100,78 @@
         const statusBox = document.getElementById('status');
         const title = document.getElementById('title');
 
-        // Check if a standard browser extension is available (Defaulting to Solana/Phantom provider style)
+        // Official Devnet USDC Mint Address
+        const DEVNET_USDC_MINT = "4zMMC9srt5Ri5X1nsURDE9UtX64acYY8B25LdfJjDQ67";
+
+        // Setup connection to Solana Devnet RPC
+        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+
         function getProvider() {
             if ('solana' in window) {
                 const provider = window.solana;
-                if (provider.isPhantom || provider) {
-                    return provider;
-                }
+                if (provider.isPhantom || provider) return provider;
             }
-            // Fallback checking for other injected wallets
             if (window.solflare) return window.solflare;
             return null;
         }
 
-        function updateUIConnected(publicKey) {
+        // Fetch balances directly from the Devnet blockchain
+        async function fetchBalances(publicKeyString) {
+            try {
+                const pubKey = new solanaWeb3.PublicKey(publicKeyString);
+
+                // 1. Fetch SOL Balance
+                const lamports = await connection.getBalance(pubKey);
+                const solBalance = lamports / solanaWeb3.LAMPORTS_PER_SOL;
+
+                // 2. Fetch Devnet USDC Balance
+                let usdcBalance = "0.00";
+                try {
+                    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(pubKey, {
+                        mint: new solanaWeb3.PublicKey(DEVNET_USDC_MINT)
+                    });
+
+                    if (tokenAccounts.value.length > 0) {
+                        const amountInfo = tokenAccounts.value[0].account.data.parsed.info.tokenAmount;
+                        usdcBalance = amountInfo.uiAmountString;
+                    }
+                } catch (tokenErr) {
+                    console.error("Error reading token accounts:", tokenErr);
+                }
+
+                return { sol: solBalance.toFixed(4), usdc: usdcBalance };
+            } catch (err) {
+                console.error("Error fetching blockchain data:", err);
+                return { sol: "Error", usdc: "Error" };
+            }
+        }
+
+        async function updateUIConnected(publicKey) {
             const shortAddress = `${publicKey.substring(0, 4)}...${publicKey.substring(publicKey.length - 4)}`;
             title.innerText = "Wallet Active";
             
+            // Set temporary loading message while pinging RPC node
             statusBox.className = "status-box success";
             statusBox.style.display = "block";
-            statusBox.innerHTML = `<strong>🟢 Connection Successful!</strong><br>Address: ${shortAddress}`;
+            statusBox.innerHTML = `<strong>🟢 Connected:</strong> ${shortAddress}<br><br><i>Loading balances...</i>`;
             
             connectBtn.innerText = "Wallet Connected";
             connectBtn.disabled = true;
             disconnectBtn.classList.remove('hidden');
+
+            // Fetch live balances and append to layout
+            const balances = await fetchBalances(publicKey);
+            statusBox.innerHTML = `
+                <strong>🟢 Connected:</strong> ${shortAddress}
+                <div class="balance-item" style="margin-top: 15px;">
+                    <span>SOL Balance:</span>
+                    <span class="balance-value">${balances.sol} SOL</span>
+                </div>
+                <div class="balance-item">
+                    <span>USDC Balance:</span>
+                    <span class="balance-value">$${balances.usdc}</span>
+                </div>
+            `;
         }
 
         function updateUIDisconnected() {
@@ -109,7 +182,6 @@
             disconnectBtn.classList.add('hidden');
         }
 
-        // Robust Connection Handler
         async function connectWallet(e, isAutoConnect = false) {
             const provider = getProvider();
 
@@ -121,26 +193,24 @@
             }
 
             try {
-                // If it's an auto-connect attempt, tell the wallet to connect silently
+                // Ensure your Phantom/Solflare extension is set to "Devnet" in its developer settings
                 const resp = await provider.connect(isAutoConnect ? { onlyIfTrusted: true } : {});
                 const pubKey = resp.publicKey ? resp.publicKey.toString() : provider.publicKey?.toString();
                 
                 if (pubKey) {
                     localStorage.setItem('wallet_connected_flag', 'true');
-                    updateUIConnected(pubKey);
+                    await updateUIConnected(pubKey);
                 }
             } catch (err) {
-                // User rejected or auto-connect failed silently
                 if (!isAutoConnect) {
                     statusBox.className = "status-box info";
                     statusBox.style.display = "block";
                     statusBox.innerText = `Connection error: ${err.message}`;
                 }
-                console.warn("Wallet connection attempt evaluated:", err.message);
+                console.warn("Wallet handshake handled:", err.message);
             }
         }
 
-        // Disconnect Handler
         async function disconnectWallet() {
             const provider = getProvider();
             if (provider && provider.disconnect) {
@@ -150,15 +220,12 @@
             updateUIDisconnected();
         }
 
-        // Event Listeners
         connectBtn.addEventListener('click', (e) => connectWallet(e, false));
         disconnectBtn.addEventListener('click', disconnectWallet);
 
-        // Auto-Connect Loop (Triggers automatically when the page loads)
         window.addEventListener('load', () => {
             const wasConnected = localStorage.getItem('wallet_connected_flag');
             if (wasConnected === 'true') {
-                // Attempt a silent auto-connection
                 connectWallet(null, true);
             }
         });
