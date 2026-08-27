@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solana Devnet Wallet & Balance Tracker</title>
-    <!-- Official Solana Web3.js Production Bundle via CDN -->
-    <script src="https://unpkg.com"></script>
+    <!-- Fixed Production Bundle via UNPKG CDN -->
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -100,11 +100,15 @@
         const statusBox = document.getElementById('status');
         const title = document.getElementById('title');
 
-        // Official Devnet USDC Mint Address
         const DEVNET_USDC_MINT = "4zMMC9srt5Ri5X1nsURDE9UtX64acYY8B25LdfJjDQ67";
+        let connection;
 
-        // Setup connection to Solana Devnet RPC
-        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+        // Initialize connection safely after checking dependency presence
+        if (typeof solanaWeb3 !== 'undefined') {
+            connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
+        } else {
+            console.error("Critical: solanaWeb3 SDK failed to load from CDN.");
+        }
 
         function getProvider() {
             if ('solana' in window) {
@@ -115,16 +119,14 @@
             return null;
         }
 
-        // Fetch balances directly from the Devnet blockchain
         async function fetchBalances(publicKeyString) {
+            if (!connection) return { sol: "SDK Error", usdc: "SDK Error" };
             try {
                 const pubKey = new solanaWeb3.PublicKey(publicKeyString);
 
-                // 1. Fetch SOL Balance
                 const lamports = await connection.getBalance(pubKey);
                 const solBalance = lamports / solanaWeb3.LAMPORTS_PER_SOL;
 
-                // 2. Fetch Devnet USDC Balance
                 let usdcBalance = "0.00";
                 try {
                     const tokenAccounts = await connection.getParsedTokenAccountsByOwner(pubKey, {
@@ -136,12 +138,12 @@
                         usdcBalance = amountInfo.uiAmountString;
                     }
                 } catch (tokenErr) {
-                    console.error("Error reading token accounts:", tokenErr);
+                    console.error("Token Account lookup bypassed:", tokenErr);
                 }
 
                 return { sol: solBalance.toFixed(4), usdc: usdcBalance };
             } catch (err) {
-                console.error("Error fetching blockchain data:", err);
+                console.error("Blockchain RPC Fetch error:", err);
                 return { sol: "Error", usdc: "Error" };
             }
         }
@@ -150,7 +152,6 @@
             const shortAddress = `${publicKey.substring(0, 4)}...${publicKey.substring(publicKey.length - 4)}`;
             title.innerText = "Wallet Active";
             
-            // Set temporary loading message while pinging RPC node
             statusBox.className = "status-box success";
             statusBox.style.display = "block";
             statusBox.innerHTML = `<strong>🟢 Connected:</strong> ${shortAddress}<br><br><i>Loading balances...</i>`;
@@ -159,7 +160,6 @@
             connectBtn.disabled = true;
             disconnectBtn.classList.remove('hidden');
 
-            // Fetch live balances and append to layout
             const balances = await fetchBalances(publicKey);
             statusBox.innerHTML = `
                 <strong>🟢 Connected:</strong> ${shortAddress}
@@ -193,7 +193,6 @@
             }
 
             try {
-                // Ensure your Phantom/Solflare extension is set to "Devnet" in its developer settings
                 const resp = await provider.connect(isAutoConnect ? { onlyIfTrusted: true } : {});
                 const pubKey = resp.publicKey ? resp.publicKey.toString() : provider.publicKey?.toString();
                 
@@ -207,7 +206,7 @@
                     statusBox.style.display = "block";
                     statusBox.innerText = `Connection error: ${err.message}`;
                 }
-                console.warn("Wallet handshake handled:", err.message);
+                console.warn("Handshake processed:", err.message);
             }
         }
 
