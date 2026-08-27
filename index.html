@@ -6,7 +6,7 @@
     <title>CONFLUENCE App Intro & Dashboard</title>
     <!-- Import Vipnagorgialla font -->
     <link href="https://fonts.cdnfonts.com/css/vipnagorgialla" rel="stylesheet">
-    <style> 
+    <style>
         /* --- RESET & BASE --- */
         * {
             margin: 0;
@@ -978,7 +978,8 @@
         }
 
         /* Scanner & Wallet Selection Module */
-        .wallet-scanner-content, .wallet-list-content {
+        .wallet-scanner-content,
+        .wallet-list-content {
             display: none;
             flex-direction: column;
             height: 100%;
@@ -1060,6 +1061,36 @@
             border: 1px solid rgba(16, 185, 129, 0.2);
             padding: 3px 8px;
             border-radius: 20px;
+        }
+
+        /* --- PORTFOLIO VALUE STYLING — NORMAL SUPER BOLD --- */
+        .portfolio-value {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 38px;
+            font-weight: 900;
+            color: #10B981;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- DISCONNECT BUTTON INSIDE POPOVER --- */
+        #disconnectWalletBtn {
+            width: 100%;
+            margin-top: 4px;
+            text-align: center;
+            cursor: pointer;
+            padding: 6px 0;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid #3a3a3a;
+            color: #e74c3c;
+            font-weight: 600;
+            font-size: 13px;
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        #disconnectWalletBtn:hover {
+            background: #2a1a1a;
+            border-color: #e74c3c;
         }
     </style>
 </head>
@@ -1171,7 +1202,7 @@
                         <span id="connectWalletBtnText">Connect Wallet</span>
                     </button>
 
-                    <!-- Wallet Balance Badge -->
+                    <!-- Wallet Balance Badge (shows SOL balance, not portfolio value) -->
                     <div class="wallet-balance-badge" id="walletBalanceBadge">
                         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="8" />
@@ -1765,7 +1796,8 @@
                     <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: #121212; border: 1px solid #222222; border-radius: 16px; padding: 24px;">
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             <span style="font-size: 14px; color: #888888; font-weight: 600;">Total Portfolio Value</span>
-                            <span style="font-family: 'Vipnagorgialla', sans-serif; font-size: 38px; font-weight: 700; color: #10B981;" id="portfolioTotalVal">$0</span>
+                            <!-- Portfolio value now uses a normal super bold font and always shows $0 -->
+                            <span class="portfolio-value" id="portfolioTotalVal">$0</span>
                         </div>
                         <button class="btn-action portfolioConnectBtn" style="background: linear-gradient(135deg, #0052D4 0%, #4364F7 100%); border: none; padding: 12px 24px; font-weight: 600; cursor: pointer;">
                             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
@@ -2083,6 +2115,7 @@
         const walletStep3 = document.getElementById('walletStep3');
 
         const badgeBalanceText = document.getElementById('badgeBalanceText');
+        // portfolioTotalVal is now always $0 — we never overwrite it with wallet balances.
         const portfolioTotalVal = document.getElementById('portfolioTotalVal');
         const profileBtn = document.getElementById('profileBtn');
         const profilePopover = document.getElementById('profilePopover');
@@ -2099,9 +2132,9 @@
 
         function shortAddress(address) {
             if (!address) return 'Not Connected';
-            return address.length > 10
-                ? `${address.slice(0, 4)}...${address.slice(-4)}`
-                : address;
+            return address.length > 10 ?
+                `${address.slice(0, 4)}...${address.slice(-4)}` :
+                address;
         }
 
         function setScannerMessage(message) {
@@ -2158,24 +2191,26 @@
         function resetPortfolioButtons() {
             portfolioConnectBtns.forEach(btn => {
                 btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
-                        <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
-                        <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
-                        <path d="M18 12a2 2 0 0 0-2 2c0 1.1-0.9 2-2 2h4v-4h-4z" />
-                    </svg>
-                    <span>Connect Wallet</span>
-                `;
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
+                            <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                            <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                            <path d="M18 12a2 2 0 0 0-2 2c0 1.1-0.9 2-2 2h4v-4h-4z" />
+                        </svg>
+                        <span>Connect Wallet</span>
+                    `;
             });
         }
 
         function resetWalletUI() {
             connectBtnText.textContent = 'Connect Wallet';
             badgeBalanceText.textContent = '$0';
+            // Portfolio value always stays $0 — never overwritten.
             portfolioTotalVal.textContent = '$0';
             popoverWalletAddress.textContent = 'Not Connected';
             popoverSolBalance.textContent = '0.00 SOL';
             popoverUsdcBalance.textContent = '0.00 USDC';
             resetPortfolioButtons();
+            syncDisconnectVisibility();
         }
 
         function applyWalletSession({ name, publicKey, solBalance, usdcBalance }) {
@@ -2186,10 +2221,12 @@
 
             connectBtnText.textContent = short;
 
-            // No live SOL/USD price source was requested, so do not invent a USD
-            // portfolio valuation. Show the live asset composition instead.
+            // Wallet badge shows SOL balance — this is the wallet balance, NOT portfolio value.
             badgeBalanceText.textContent = `${sol.toFixed(2)} SOL`;
-            portfolioTotalVal.textContent = `${sol.toFixed(2)} SOL + ${usdc.toFixed(2)} USDC`;
+
+            // Portfolio value remains $0 — it only counts investments & returns on memcoins.
+            // We do NOT update portfolioTotalVal here.
+            portfolioTotalVal.textContent = '$0';
 
             popoverWalletAddress.textContent = short;
             popoverWalletAddress.title = address;
@@ -2199,24 +2236,24 @@
 
             portfolioConnectBtns.forEach(btn => {
                 btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
-                        <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
-                        <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
-                        <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
-                    </svg>
-                    <span>${short}</span>
-                `;
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
+                            <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                            <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                            <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
+                        </svg>
+                        <span>${short}</span>
+                    `;
             });
 
             profilePopover.dataset.walletStatus = 'connected';
+            syncDisconnectVisibility();
         }
 
         async function fetchWalletBalances(publicKey) {
             const [lamports, tokenAccounts] = await Promise.all([
                 connection.getBalance(publicKey, 'confirmed'),
                 connection.getParsedTokenAccountsByOwner(
-                    publicKey,
-                    { mint: USDC_MINT },
+                    publicKey, { mint: USDC_MINT },
                     'confirmed'
                 )
             ]);
@@ -2275,9 +2312,9 @@
                 }
 
                 try {
-                    activePublicKey = publicKey instanceof solanaWeb3.PublicKey
-                        ? publicKey
-                        : new solanaWeb3.PublicKey(publicKey.toString());
+                    activePublicKey = publicKey instanceof solanaWeb3.PublicKey ?
+                        publicKey :
+                        new solanaWeb3.PublicKey(publicKey.toString());
 
                     const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
                     applyWalletSession({
@@ -2308,9 +2345,9 @@
 
             activeProvider = provider;
             activeWalletName = walletName;
-            activePublicKey = publicKeyValue instanceof solanaWeb3.PublicKey
-                ? publicKeyValue
-                : new solanaWeb3.PublicKey(publicKeyValue.toString());
+            activePublicKey = publicKeyValue instanceof solanaWeb3.PublicKey ?
+                publicKeyValue :
+                new solanaWeb3.PublicKey(publicKeyValue.toString());
 
             bindProviderEvents(provider);
 
@@ -2452,8 +2489,7 @@
             }
         }
 
-        // The existing profile popover is kept intact; add only a small disconnect
-        // action to it when needed. This does not replace or destroy its markup.
+        // Add a disconnect button inside the profile popover.
         const disconnectBtn = document.createElement('div');
         disconnectBtn.id = 'disconnectWalletBtn';
         disconnectBtn.textContent = 'Disconnect Wallet';
@@ -2484,19 +2520,6 @@
             disconnectBtn.style.display = activePublicKey ? 'block' : 'none';
         }
 
-        // Wrap session application/reset visibility without changing the existing UI.
-        const originalApplyWalletSession = applyWalletSession;
-        applyWalletSession = function(data) {
-            originalApplyWalletSession(data);
-            syncDisconnectVisibility();
-        };
-
-        const originalResetWalletUI = resetWalletUI;
-        resetWalletUI = function() {
-            originalResetWalletUI();
-            syncDisconnectVisibility();
-        };
-
         // Profile Popover Toggle
         profileBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -2512,12 +2535,9 @@
         });
 
         // Optional header/profile settings compatibility:
-        // if a future settings/logout control dispatches this event, it uses the
-        // same real provider disconnect pipeline.
         window.addEventListener('confluence:logout', () => disconnectWallet(true));
 
         // Auto-connect persistence:
-        // On reload, onlyIfTrusted prevents a new wallet approval popup.
         window.addEventListener('load', async () => {
             if (localStorage.getItem(WALLET_CONNECTED_FLAG) !== 'true') return;
 
@@ -2543,12 +2563,6 @@
                     console.debug(`${name} silent auto-connect unavailable.`, error);
                 }
             }
-        });
-
-        // Keep the UI reset even if a wallet extension disappears/revokes its session.
-        window.addEventListener('beforeunload', () => {
-            // Do not call provider.disconnect() here; page unload should not revoke
-            // the extension's own trusted connection.
         });
 
         // Start in the same visual disconnected state as the original template.
