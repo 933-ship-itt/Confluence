@@ -2001,7 +2001,11 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Solana Web3 SDK is loaded as an ES module so this standalone HTML file
+        // can use real Devnet RPC calls without a bundler.
+        import * as solanaWeb3 from 'https://esm.sh/@solana/web3.js@1.98.4';
+
         // Intro Screen Timer
         setTimeout(() => {
             const intro = document.getElementById('introScreen');
@@ -2030,7 +2034,7 @@
             const activeView = document.getElementById(targetViewId);
             const loader = document.getElementById('tabLoader');
 
-            if (activeBtn.classList.contains('active')) return;
+            if (!activeBtn || !activeView || activeBtn.classList.contains('active')) return;
 
             isSwitching = true;
 
@@ -2051,7 +2055,21 @@
             }, 450);
         }
 
-        // --- WALLET CONNECT FUNCTIONALITY & STATE PERSISTENCE ---
+        // Keep the existing inline tab handlers working after converting the script
+        // to an ES module.
+        window.switchMainTab = switchMainTab;
+
+        // --- REAL SOLANA DEVNET WALLET CONNECTIVITY ---
+        const DEVNET_RPC = solanaWeb3.clusterApiUrl('devnet');
+        const connection = new solanaWeb3.Connection(DEVNET_RPC, 'confirmed');
+
+        // Official Circle Devnet USDC SPL token mint.
+        const USDC_MINT = new solanaWeb3.PublicKey(
+            '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
+        );
+        const USDC_DECIMALS = 6;
+        const WALLET_CONNECTED_FLAG = 'wallet_connected_flag';
+
         const connectBtn = document.getElementById('connectWalletBtn');
         const connectBtnText = document.getElementById('connectWalletBtnText');
         const portfolioConnectBtns = document.querySelectorAll('.portfolioConnectBtn');
@@ -2072,7 +2090,56 @@
         const popoverSolBalance = document.getElementById('popoverSolBalance');
         const popoverUsdcBalance = document.getElementById('popoverUsdcBalance');
 
-        // Open Modal Handler
+        // The current provider is kept only in memory. No private key or seed phrase
+        // is ever requested or stored.
+        let activeProvider = null;
+        let activeWalletName = null;
+        let activePublicKey = null;
+        let balanceRefreshInFlight = false;
+
+        function shortAddress(address) {
+            if (!address) return 'Not Connected';
+            return address.length > 10
+                ? `${address.slice(0, 4)}...${address.slice(-4)}`
+                : address;
+        }
+
+        function setScannerMessage(message) {
+            const messageEl = walletStep2.querySelector('.scanner-loader-wrap span');
+            if (messageEl) messageEl.textContent = message;
+        }
+
+        function getProviderCandidates() {
+            const candidates = [];
+
+            // Phantom exposes window.phantom.solana and, in many browsers,
+            // window.solana. Prefer the explicit namespace when available.
+            const phantomProvider = window.phantom?.solana ||
+                (window.solana?.isPhantom ? window.solana : null);
+            if (phantomProvider) {
+                candidates.push({ name: 'Phantom', provider: phantomProvider });
+            }
+
+            const solflareProvider = window.solflare ||
+                (window.solana?.isSolflare ? window.solana : null);
+            if (solflareProvider && !candidates.some(item => item.provider === solflareProvider)) {
+                candidates.push({ name: 'Solflare', provider: solflareProvider });
+            }
+
+            // Backpack commonly exposes its Solana provider under window.backpack.solana.
+            const backpackProvider = window.backpack?.solana ||
+                (window.backpack?.isBackpack ? window.backpack : null);
+            if (backpackProvider && !candidates.some(item => item.provider === backpackProvider)) {
+                candidates.push({ name: 'Backpack', provider: backpackProvider });
+            }
+
+            return candidates.filter(item => item.provider && typeof item.provider.connect === 'function');
+        }
+
+        function getProviderByName(walletName) {
+            return getProviderCandidates().find(item => item.name === walletName)?.provider || null;
+        }
+
         function openWalletModal() {
             walletStep1.style.display = 'flex';
             walletStep2.style.display = 'none';
@@ -2086,44 +2153,49 @@
             dashboardScreen.classList.remove('blurred');
         }
 
-        connectBtn.addEventListener('click', openWalletModal);
-        portfolioConnectBtns.forEach(btn => btn.addEventListener('click', openWalletModal));
-        cancelWalletModalBtn.addEventListener('click', closeWalletModal);
+        window.closeWalletModal = closeWalletModal;
 
-        // Understood clicked -> Blur & Deactivate background, show loader and scan
-        understoodWalletBtn.addEventListener('click', () => {
-            walletStep1.style.display = 'none';
-            walletStep2.style.display = 'flex';
-
-            setTimeout(() => {
-                walletStep2.style.display = 'none';
-                walletStep3.style.display = 'flex';
-            }, 1200);
-        });
-
-        // Select Solana Wallet handler
-        function selectSolanaWallet(walletName, solVal, usdcVal) {
-            const walletData = {
-                name: walletName,
-                address: '7xKX...3m2p (' + walletName + ')',
-                sol: solVal,
-                usdc: usdcVal,
-                totalUSD: '$' + (parseFloat(solVal) * 180 + parseFloat(usdcVal)).toFixed(2)
-            };
-
-            localStorage.setItem('confluence_connected_wallet', JSON.stringify(walletData));
-            applyWalletSession(walletData);
-            closeWalletModal();
+        function resetPortfolioButtons() {
+            portfolioConnectBtns.forEach(btn => {
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
+                        <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                        <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                        <path d="M18 12a2 2 0 0 0-2 2c0 1.1-0.9 2-2 2h4v-4h-4z" />
+                    </svg>
+                    <span>Connect Wallet</span>
+                `;
+            });
         }
 
-        // Apply active wallet session to UI
-        function applyWalletSession(data) {
-            connectBtnText.textContent = data.name + ' Connected';
-            badgeBalanceText.textContent = data.totalUSD;
-            portfolioTotalVal.textContent = data.totalUSD;
-            popoverWalletAddress.textContent = data.address;
-            popoverSolBalance.textContent = data.sol;
-            popoverUsdcBalance.textContent = data.usdc;
+        function resetWalletUI() {
+            connectBtnText.textContent = 'Connect Wallet';
+            badgeBalanceText.textContent = '$0';
+            portfolioTotalVal.textContent = '$0';
+            popoverWalletAddress.textContent = 'Not Connected';
+            popoverSolBalance.textContent = '0.00 SOL';
+            popoverUsdcBalance.textContent = '0.00 USDC';
+            resetPortfolioButtons();
+        }
+
+        function applyWalletSession({ name, publicKey, solBalance, usdcBalance }) {
+            const address = publicKey.toString();
+            const short = shortAddress(address);
+            const sol = Number(solBalance);
+            const usdc = Number(usdcBalance);
+
+            connectBtnText.textContent = short;
+
+            // No live SOL/USD price source was requested, so do not invent a USD
+            // portfolio valuation. Show the live asset composition instead.
+            badgeBalanceText.textContent = `${sol.toFixed(2)} SOL`;
+            portfolioTotalVal.textContent = `${sol.toFixed(2)} SOL + ${usdc.toFixed(2)} USDC`;
+
+            popoverWalletAddress.textContent = short;
+            popoverWalletAddress.title = address;
+            popoverWalletAddress.setAttribute('aria-label', `Connected: ${address}`);
+            popoverSolBalance.textContent = `${sol.toFixed(2)} SOL`;
+            popoverUsdcBalance.textContent = `${usdc.toFixed(2)} USDC`;
 
             portfolioConnectBtns.forEach(btn => {
                 btn.innerHTML = `
@@ -2132,10 +2204,298 @@
                         <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
                         <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
                     </svg>
-                    <span>${data.name} Connected</span>
+                    <span>${short}</span>
                 `;
             });
+
+            profilePopover.dataset.walletStatus = 'connected';
         }
+
+        async function fetchWalletBalances(publicKey) {
+            const [lamports, tokenAccounts] = await Promise.all([
+                connection.getBalance(publicKey, 'confirmed'),
+                connection.getParsedTokenAccountsByOwner(
+                    publicKey,
+                    { mint: USDC_MINT },
+                    'confirmed'
+                )
+            ]);
+
+            const solBalance = lamports / solanaWeb3.LAMPORTS_PER_SOL;
+
+            let rawUsdcAmount = 0n;
+            for (const account of tokenAccounts.value) {
+                const amount = account.account.data.parsed?.info?.tokenAmount?.amount;
+                if (amount) rawUsdcAmount += BigInt(amount);
+            }
+
+            const usdcBalance = Number(rawUsdcAmount) / (10 ** USDC_DECIMALS);
+
+            return { solBalance, usdcBalance };
+        }
+
+        async function refreshWalletBalances() {
+            if (!activePublicKey || balanceRefreshInFlight) return;
+
+            balanceRefreshInFlight = true;
+            try {
+                const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
+                applyWalletSession({
+                    name: activeWalletName || 'Wallet',
+                    publicKey: activePublicKey,
+                    solBalance,
+                    usdcBalance
+                });
+            } catch (error) {
+                console.error('Failed to fetch Solana Devnet balances:', error);
+            } finally {
+                balanceRefreshInFlight = false;
+            }
+        }
+
+        function bindProviderEvents(provider) {
+            if (!provider || typeof provider.on !== 'function') return;
+
+            // Avoid stacking listeners if the same extension provider is selected again.
+            if (provider.__confluenceListenersBound) return;
+            provider.__confluenceListenersBound = true;
+
+            provider.on('disconnect', () => {
+                if (activeProvider === provider) {
+                    disconnectWallet(false);
+                }
+            });
+
+            provider.on('accountChanged', async (publicKey) => {
+                if (activeProvider !== provider) return;
+
+                if (!publicKey) {
+                    await disconnectWallet(false);
+                    return;
+                }
+
+                try {
+                    activePublicKey = publicKey instanceof solanaWeb3.PublicKey
+                        ? publicKey
+                        : new solanaWeb3.PublicKey(publicKey.toString());
+
+                    const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
+                    applyWalletSession({
+                        name: activeWalletName || 'Wallet',
+                        publicKey: activePublicKey,
+                        solBalance,
+                        usdcBalance
+                    });
+                    localStorage.setItem(WALLET_CONNECTED_FLAG, 'true');
+                } catch (error) {
+                    console.error('Failed to refresh changed wallet account:', error);
+                }
+            });
+        }
+
+        async function connectToProvider(provider, walletName, options = {}) {
+            if (!provider || typeof provider.connect !== 'function') {
+                throw new Error(`${walletName} provider is not available.`);
+            }
+
+            // This is the actual wallet handshake. The extension owns the approval UI.
+            const response = await provider.connect(options);
+
+            const publicKeyValue = response?.publicKey || provider.publicKey;
+            if (!publicKeyValue) {
+                throw new Error(`${walletName} did not return a public key.`);
+            }
+
+            activeProvider = provider;
+            activeWalletName = walletName;
+            activePublicKey = publicKeyValue instanceof solanaWeb3.PublicKey
+                ? publicKeyValue
+                : new solanaWeb3.PublicKey(publicKeyValue.toString());
+
+            bindProviderEvents(provider);
+
+            const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
+
+            applyWalletSession({
+                name: walletName,
+                publicKey: activePublicKey,
+                solBalance,
+                usdcBalance
+            });
+
+            localStorage.setItem(WALLET_CONNECTED_FLAG, 'true');
+            closeWalletModal();
+        }
+
+        // Step 1 -> real browser extension discovery.
+        async function scanForSolanaWallets() {
+            walletStep1.style.display = 'none';
+            walletStep2.style.display = 'flex';
+            setScannerMessage('Scanning browser extensions for active Solana wallets...');
+
+            // Give the browser a microtask to finish exposing injected providers,
+            // but do not use a fake timed "scan".
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            const detected = getProviderCandidates();
+
+            walletStep2.style.display = 'none';
+            walletStep3.style.display = 'flex';
+
+            const walletItems = [...walletStep3.querySelectorAll('.wallet-option-item')];
+
+            walletItems.forEach(item => {
+                const name = item.querySelector('.wallet-option-name')?.textContent?.trim();
+                const providerEntry = detected.find(candidate => candidate.name === name);
+                const badge = item.querySelector('.wallet-detected-badge');
+
+                // Remove the old fake inline handlers so only the real provider
+                // connection path runs.
+                item.removeAttribute('onclick');
+
+                if (!providerEntry) {
+                    item.style.display = 'none';
+                    return;
+                }
+
+                item.style.display = 'flex';
+                if (badge) badge.textContent = 'Detected';
+
+                // Clone the node so a repeated scan never creates duplicate listeners.
+                const freshItem = item.cloneNode(true);
+                item.replaceWith(freshItem);
+
+                freshItem.addEventListener('click', () => {
+                    selectSolanaWallet(name);
+                });
+            });
+
+            if (detected.length === 0) {
+                setScannerMessage(
+                    'No supported Solana wallet extension was detected. Install Phantom, Solflare, or Backpack, then try again.'
+                );
+                walletStep3.querySelector('.wallet-modal-title').textContent = 'No Wallet Detected';
+                walletStep3.querySelector('.wallet-options-list').style.display = 'none';
+            } else {
+                walletStep3.querySelector('.wallet-modal-title').textContent = 'Select Solana Web3 Wallet';
+                walletStep3.querySelector('.wallet-options-list').style.display = 'flex';
+            }
+        }
+
+        // Step 3 -> real provider.connect() handshake.
+        async function selectSolanaWallet(walletName) {
+            const provider = getProviderByName(walletName);
+
+            if (!provider) {
+                console.warn(`${walletName} provider is no longer available.`);
+                await scanForSolanaWallets();
+                return;
+            }
+
+            try {
+                // The browser extension will show its own approval prompt here.
+                await connectToProvider(provider, walletName);
+            } catch (error) {
+                console.error(`${walletName} connection failed:`, error);
+                setScannerMessage(
+                    `${walletName} connection was cancelled or failed. Please try again.`
+                );
+                walletStep3.style.display = 'none';
+                walletStep2.style.display = 'flex';
+            }
+        }
+
+        window.selectSolanaWallet = selectSolanaWallet;
+
+        connectBtn.addEventListener('click', () => {
+            if (activePublicKey) {
+                profilePopover.classList.toggle('show');
+                return;
+            }
+            openWalletModal();
+        });
+
+        portfolioConnectBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (activePublicKey) {
+                    profilePopover.classList.toggle('show');
+                    return;
+                }
+                openWalletModal();
+            });
+        });
+
+        cancelWalletModalBtn.addEventListener('click', closeWalletModal);
+
+        // "Understood" now performs the real provider discovery step.
+        understoodWalletBtn.addEventListener('click', scanForSolanaWallets);
+
+        // --- DISCONNECT PIPELINE ---
+        async function disconnectWallet(callProviderDisconnect = true) {
+            const provider = activeProvider;
+
+            activeProvider = null;
+            activeWalletName = null;
+            activePublicKey = null;
+            localStorage.removeItem(WALLET_CONNECTED_FLAG);
+
+            resetWalletUI();
+            profilePopover.classList.remove('show');
+            closeWalletModal();
+
+            if (callProviderDisconnect && provider && typeof provider.disconnect === 'function') {
+                try {
+                    await provider.disconnect();
+                } catch (error) {
+                    console.warn('Wallet provider disconnect failed:', error);
+                }
+            }
+        }
+
+        // The existing profile popover is kept intact; add only a small disconnect
+        // action to it when needed. This does not replace or destroy its markup.
+        const disconnectBtn = document.createElement('div');
+        disconnectBtn.id = 'disconnectWalletBtn';
+        disconnectBtn.textContent = 'Disconnect Wallet';
+        disconnectBtn.className = 'btn-modal-cancel';
+        disconnectBtn.style.width = '100%';
+        disconnectBtn.style.marginTop = '4px';
+        disconnectBtn.style.display = 'none';
+        disconnectBtn.style.textAlign = 'center';
+        disconnectBtn.style.cursor = 'pointer';
+        disconnectBtn.setAttribute('role', 'button');
+        disconnectBtn.setAttribute('tabindex', '0');
+        profilePopover.appendChild(disconnectBtn);
+
+        const handleDisconnectClick = async (event) => {
+            event.stopPropagation();
+            await disconnectWallet(true);
+        };
+
+        disconnectBtn.addEventListener('click', handleDisconnectClick);
+        disconnectBtn.addEventListener('keydown', async (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                await handleDisconnectClick(event);
+            }
+        });
+
+        function syncDisconnectVisibility() {
+            disconnectBtn.style.display = activePublicKey ? 'block' : 'none';
+        }
+
+        // Wrap session application/reset visibility without changing the existing UI.
+        const originalApplyWalletSession = applyWalletSession;
+        applyWalletSession = function(data) {
+            originalApplyWalletSession(data);
+            syncDisconnectVisibility();
+        };
+
+        const originalResetWalletUI = resetWalletUI;
+        resetWalletUI = function() {
+            originalResetWalletUI();
+            syncDisconnectVisibility();
+        };
 
         // Profile Popover Toggle
         profileBtn.addEventListener('click', (e) => {
@@ -2143,22 +2503,56 @@
             profilePopover.classList.toggle('show');
         });
 
+        profilePopover.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
         document.addEventListener('click', () => {
             profilePopover.classList.remove('show');
         });
 
-        // Check LocalStorage on initial load for auto-connect
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedWallet = localStorage.getItem('confluence_connected_wallet');
-            if (savedWallet) {
+        // Optional header/profile settings compatibility:
+        // if a future settings/logout control dispatches this event, it uses the
+        // same real provider disconnect pipeline.
+        window.addEventListener('confluence:logout', () => disconnectWallet(true));
+
+        // Auto-connect persistence:
+        // On reload, onlyIfTrusted prevents a new wallet approval popup.
+        window.addEventListener('load', async () => {
+            if (localStorage.getItem(WALLET_CONNECTED_FLAG) !== 'true') return;
+
+            const detected = getProviderCandidates();
+            if (detected.length === 0) return;
+
+            // Prefer the provider currently holding a public key, otherwise try each
+            // detected provider silently until one is trusted.
+            const providersToTry = [...detected].sort((a, b) => {
+                const aHasKey = !!a.provider.publicKey;
+                const bHasKey = !!b.provider.publicKey;
+                return Number(bHasKey) - Number(aHasKey);
+            });
+
+            for (const { name, provider } of providersToTry) {
                 try {
-                    const parsedData = JSON.parse(savedWallet);
-                    applyWalletSession(parsedData);
-                } catch (e) {
-                    console.error('Error parsing saved wallet', e);
+                    // Required silent trusted-session query.
+                    await connectToProvider(provider, name, { onlyIfTrusted: true });
+                    return;
+                } catch (error) {
+                    // A rejected onlyIfTrusted call means this provider is not
+                    // currently trusted; continue without opening any modal.
+                    console.debug(`${name} silent auto-connect unavailable.`, error);
                 }
             }
         });
+
+        // Keep the UI reset even if a wallet extension disappears/revokes its session.
+        window.addEventListener('beforeunload', () => {
+            // Do not call provider.disconnect() here; page unload should not revoke
+            // the extension's own trusted connection.
+        });
+
+        // Start in the same visual disconnected state as the original template.
+        resetWalletUI();
     </script>
 
 </body>
