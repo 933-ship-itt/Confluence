@@ -444,6 +444,7 @@
             color: #888888;
             border-bottom: 1px solid #222222;
             padding-bottom: 8px;
+            word-break: break-all;
         }
 
         .popover-balance-row {
@@ -875,192 +876,6 @@
             color: #444444;
             margin-top: 1px;
         }
-
-        /* --- WALLET CONNECT MODAL & 5:3 FRAME OVERLAY --- */
-        .wallet-modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            background-color: rgba(0, 0, 0, 0.75);
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .wallet-modal-overlay.show {
-            display: flex;
-        }
-
-        .wallet-modal-frame {
-            width: 100%;
-            max-width: 540px;
-            aspect-ratio: 5 / 3;
-            background-color: #141414;
-            border: 1px solid #2a2a2a;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        .wallet-modal-title {
-            font-family: 'Vipnagorgialla', 'Segoe UI', sans-serif;
-            font-size: 22px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #0052D4 0%, #6FB1FC 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .wallet-modal-body {
-            font-size: 13.5px;
-            line-height: 1.5;
-            color: #b0b0b0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .wallet-modal-body p strong {
-            color: #ffffff;
-        }
-
-        .wallet-disclaimer {
-            font-size: 11.5px;
-            color: #888888;
-            background-color: #1a1a1a;
-            border: 1px solid #262626;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        .wallet-modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        .btn-modal-cancel {
-            background: transparent;
-            border: 1px solid #333333;
-            color: #aaaaaa;
-            border-radius: 30px;
-            padding: 8px 18px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-modal-cancel:hover {
-            background: #222222;
-            color: #ffffff;
-        }
-
-        .btn-modal-primary {
-            background: linear-gradient(135deg, #0052D4 0%, #4364F7 100%);
-            border: none;
-            color: #ffffff;
-            border-radius: 30px;
-            padding: 8px 22px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s ease;
-        }
-
-        .btn-modal-primary:hover {
-            opacity: 0.9;
-        }
-
-        /* Scanner & Wallet Selection Module */
-        .wallet-scanner-content, .wallet-list-content {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            justify-content: space-between;
-        }
-
-        .scanner-loader-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            gap: 16px;
-            color: #4364F7;
-        }
-
-        .wallet-options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
-            flex: 1;
-            margin: 10px 0;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        .wallet-options-list::-webkit-scrollbar {
-            display: none;
-        }
-
-        .wallet-option-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #1c1c1c;
-            border: 1px solid #2a2a2a;
-            border-radius: 14px;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: border-color 0.2s ease, background-color 0.2s ease;
-        }
-
-        .wallet-option-item:hover {
-            border-color: #4364F7;
-            background-color: #222222;
-        }
-
-        .wallet-option-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .wallet-option-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background-color: #333333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 12px;
-            color: #fff;
-        }
-
-        .wallet-option-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
-        .wallet-detected-badge {
-            font-size: 11px;
-            font-weight: 600;
-            color: #10B981;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 3px 8px;
-            border-radius: 20px;
-        }
     </style>
 </head>
 <body>
@@ -1208,6 +1023,7 @@
                                 <span>USDC Balance:</span>
                                 <span id="popoverUsdcBalance">0.00 USDC</span>
                             </div>
+                            <button id="disconnectBtn" style="margin-top: 8px; width: 100%; background: #ef4444; color: #fff; border: none; border-radius: 8px; padding: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: none;">Disconnect Wallet</button>
                         </div>
                     </button>
                 </div>
@@ -1925,82 +1741,6 @@
         </main>
     </div>
 
-    <!-- WALLET CONNECT MODAL OVERLAY -->
-    <div class="wallet-modal-overlay" id="walletModalOverlay">
-        <div class="wallet-modal-frame" id="walletModalFrame">
-            <!-- Step 1: Explanation & Security Notice -->
-            <div id="walletStep1" style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
-                <div>
-                    <div class="wallet-modal-title">Secure Wallet Connection</div>
-                    <div class="wallet-modal-body" style="margin-top: 10px;">
-                        <p><strong>How Wallet Connect Works:</strong> Confluence securely bridges with your browser extension via decentralized cryptographic protocols to authenticate your identity and display your Solana-based portfolio assets.</p>
-                        <div class="wallet-disclaimer">
-                            🔒 <strong>Privacy & Liability:</strong> We never store, request, or access your mnemonics, private keys, or personal account data. Confluence is fully non-custodial and is not liable for any lost funds or unauthorized external transactions related to your wallet account.
-                        </div>
-                    </div>
-                </div>
-                <div class="wallet-modal-footer">
-                    <button class="btn-modal-cancel" id="cancelWalletModal">Cancel</button>
-                    <button class="btn-modal-primary" id="understoodWalletBtn">Understood</button>
-                </div>
-            </div>
-
-            <!-- Step 2: Scanner / Loading state -->
-            <div class="wallet-scanner-content" id="walletStep2">
-                <div class="wallet-modal-title">Scanning Extensions</div>
-                <div class="scanner-loader-wrap">
-                    <div class="spinner" style="width: 42px; height: 42px;"></div>
-                    <span style="font-size: 14px; color: #a0a0a0; font-weight: 500;">Scanning browser extensions for active Solana wallets...</span>
-                </div>
-                <div class="wallet-modal-footer">
-                    <button class="btn-modal-cancel" onclick="closeWalletModal()">Cancel</button>
-                </div>
-            </div>
-
-            <!-- Step 3: Solana Wallet Selector Module -->
-            <div class="wallet-list-content" id="walletStep3">
-                <div class="wallet-modal-title">Select Solana Web3 Wallet</div>
-                <div class="wallet-options-list">
-                    <div class="wallet-option-item" onclick="selectSolanaWallet('Phantom', '5.42 SOL', '1420.50 USDC')">
-                        <div class="wallet-option-info">
-                            <div class="wallet-option-icon" style="background: #ab9ff2; color: #141414;">P</div>
-                            <div>
-                                <div class="wallet-option-name">Phantom</div>
-                                <div style="font-size: 11px; color: #777;">Solana browser extension</div>
-                            </div>
-                        </div>
-                        <span class="wallet-detected-badge">Detected</span>
-                    </div>
-
-                    <div class="wallet-option-item" onclick="selectSolanaWallet('Solflare', '1.85 SOL', '430.00 USDC')">
-                        <div class="wallet-option-info">
-                            <div class="wallet-option-icon" style="background: #fc7233; color: #fff;">S</div>
-                            <div>
-                                <div class="wallet-option-name">Solflare</div>
-                                <div style="font-size: 11px; color: #777;">Solana browser extension</div>
-                            </div>
-                        </div>
-                        <span class="wallet-detected-badge">Detected</span>
-                    </div>
-
-                    <div class="wallet-option-item" onclick="selectSolanaWallet('Backpack', '0.50 SOL', '85.20 USDC')">
-                        <div class="wallet-option-info">
-                            <div class="wallet-option-icon" style="background: #00d2ff; color: #141414;">B</div>
-                            <div>
-                                <div class="wallet-option-name">Backpack</div>
-                                <div style="font-size: 11px; color: #777;">Solana browser extension</div>
-                            </div>
-                        </div>
-                        <span class="wallet-detected-badge">Detected</span>
-                    </div>
-                </div>
-                <div class="wallet-modal-footer">
-                    <button class="btn-modal-cancel" onclick="closeWalletModal()">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Intro Screen Timer
         setTimeout(() => {
@@ -2051,19 +1791,60 @@
             }, 450);
         }
 
-        // --- WALLET CONNECT FUNCTIONALITY & STATE PERSISTENCE ---
+        // --- REAL SOLANA WALLET CONNECTION LOGIC ---
+        function getProvider() {
+            if (typeof window !== 'undefined') {
+                if ('solana' in window) {
+                    const provider = window.solana;
+                    if (provider.isPhantom || provider) return provider;
+                }
+                if (window.solflare) return window.solflare;
+            }
+            return null;
+        }
+
+        async function connectWallet(isAutoConnect = false) {
+            const provider = getProvider();
+            if (!provider) {
+                if (!isAutoConnect) {
+                    alert("No extension wallet detected. Please install Phantom or Solflare.");
+                }
+                return;
+            }
+            try {
+                // Silent connection if true, otherwise opens wallet popup window
+                const resp = await provider.connect(isAutoConnect ? { onlyIfTrusted: true } : {});
+                const pubKey = resp.publicKey ? resp.publicKey.toString() : provider.publicKey?.toString();
+                
+                if (pubKey) {
+                    localStorage.setItem('wallet_connected_flag', 'true');
+                    localStorage.setItem('wallet_pubkey', pubKey);
+                    updateUIConnected(pubKey);
+                    console.log("Connected Successfully:", pubKey);
+                }
+            } catch (err) {
+                console.warn("Handshake processed:", err.message);
+            }
+        }
+
+        async function disconnectWallet() {
+            const provider = getProvider();
+            if (provider && provider.disconnect) {
+                try {
+                    await provider.disconnect();
+                } catch (e) {
+                    console.warn("Disconnect error:", e);
+                }
+            }
+            localStorage.removeItem('wallet_connected_flag');
+            localStorage.removeItem('wallet_pubkey');
+            updateUIDisconnected();
+        }
+
+        // UI Handlers for Connection State
         const connectBtn = document.getElementById('connectWalletBtn');
         const connectBtnText = document.getElementById('connectWalletBtnText');
         const portfolioConnectBtns = document.querySelectorAll('.portfolioConnectBtn');
-        const walletModalOverlay = document.getElementById('walletModalOverlay');
-        const dashboardScreen = document.getElementById('dashboardScreen');
-        const cancelWalletModalBtn = document.getElementById('cancelWalletModal');
-        const understoodWalletBtn = document.getElementById('understoodWalletBtn');
-
-        const walletStep1 = document.getElementById('walletStep1');
-        const walletStep2 = document.getElementById('walletStep2');
-        const walletStep3 = document.getElementById('walletStep3');
-
         const badgeBalanceText = document.getElementById('badgeBalanceText');
         const portfolioTotalVal = document.getElementById('portfolioTotalVal');
         const profileBtn = document.getElementById('profileBtn');
@@ -2071,59 +1852,17 @@
         const popoverWalletAddress = document.getElementById('popoverWalletAddress');
         const popoverSolBalance = document.getElementById('popoverSolBalance');
         const popoverUsdcBalance = document.getElementById('popoverUsdcBalance');
+        const disconnectBtn = document.getElementById('disconnectBtn');
 
-        // Open Modal Handler
-        function openWalletModal() {
-            walletStep1.style.display = 'flex';
-            walletStep2.style.display = 'none';
-            walletStep3.style.display = 'none';
-            walletModalOverlay.classList.add('show');
-            dashboardScreen.classList.add('blurred');
-        }
-
-        function closeWalletModal() {
-            walletModalOverlay.classList.remove('show');
-            dashboardScreen.classList.remove('blurred');
-        }
-
-        connectBtn.addEventListener('click', openWalletModal);
-        portfolioConnectBtns.forEach(btn => btn.addEventListener('click', openWalletModal));
-        cancelWalletModalBtn.addEventListener('click', closeWalletModal);
-
-        // Understood clicked -> Blur & Deactivate background, show loader and scan
-        understoodWalletBtn.addEventListener('click', () => {
-            walletStep1.style.display = 'none';
-            walletStep2.style.display = 'flex';
-
-            setTimeout(() => {
-                walletStep2.style.display = 'none';
-                walletStep3.style.display = 'flex';
-            }, 1200);
-        });
-
-        // Select Solana Wallet handler
-        function selectSolanaWallet(walletName, solVal, usdcVal) {
-            const walletData = {
-                name: walletName,
-                address: '7xKX...3m2p (' + walletName + ')',
-                sol: solVal,
-                usdc: usdcVal,
-                totalUSD: '$' + (parseFloat(solVal) * 180 + parseFloat(usdcVal)).toFixed(2)
-            };
-
-            localStorage.setItem('confluence_connected_wallet', JSON.stringify(walletData));
-            applyWalletSession(walletData);
-            closeWalletModal();
-        }
-
-        // Apply active wallet session to UI
-        function applyWalletSession(data) {
-            connectBtnText.textContent = data.name + ' Connected';
-            badgeBalanceText.textContent = data.totalUSD;
-            portfolioTotalVal.textContent = data.totalUSD;
-            popoverWalletAddress.textContent = data.address;
-            popoverSolBalance.textContent = data.sol;
-            popoverUsdcBalance.textContent = data.usdc;
+        function updateUIConnected(pubKey) {
+            const shortKey = pubKey.slice(0, 4) + '...' + pubKey.slice(-4);
+            connectBtnText.textContent = shortKey;
+            badgeBalanceText.textContent = '0.00 SOL';
+            portfolioTotalVal.textContent = '0.00 SOL';
+            popoverWalletAddress.textContent = pubKey;
+            popoverSolBalance.textContent = '0.00 SOL';
+            popoverUsdcBalance.textContent = '0.00 USDC';
+            disconnectBtn.style.display = 'block';
 
             portfolioConnectBtns.forEach(btn => {
                 btn.innerHTML = `
@@ -2132,10 +1871,56 @@
                         <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
                         <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
                     </svg>
-                    <span>${data.name} Connected</span>
+                    <span>${shortKey}</span>
                 `;
             });
         }
+
+        function updateUIDisconnected() {
+            connectBtnText.textContent = 'Connect Wallet';
+            badgeBalanceText.textContent = '$0';
+            portfolioTotalVal.textContent = '$0';
+            popoverWalletAddress.textContent = 'Not Connected';
+            popoverSolBalance.textContent = '0.00 SOL';
+            popoverUsdcBalance.textContent = '0.00 USDC';
+            disconnectBtn.style.display = 'none';
+
+            portfolioConnectBtns.forEach(btn => {
+                btn.innerHTML = `
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
+                        <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                        <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                        <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
+                    </svg>
+                    <span>Connect Wallet</span>
+                `;
+            });
+        }
+
+        // Bind Connect Button Click Handler
+        connectBtn.addEventListener('click', () => {
+            const wasConnected = localStorage.getItem('wallet_connected_flag');
+            if (wasConnected !== 'true') {
+                connectWallet(false);
+            } else {
+                profilePopover.classList.toggle('show');
+            }
+        });
+
+        portfolioConnectBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const wasConnected = localStorage.getItem('wallet_connected_flag');
+                if (wasConnected !== 'true') {
+                    connectWallet(false);
+                }
+            });
+        });
+
+        disconnectBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            disconnectWallet();
+            profilePopover.classList.remove('show');
+        });
 
         // Profile Popover Toggle
         profileBtn.addEventListener('click', (e) => {
@@ -2147,15 +1932,14 @@
             profilePopover.classList.remove('show');
         });
 
-        // Check LocalStorage on initial load for auto-connect
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedWallet = localStorage.getItem('confluence_connected_wallet');
-            if (savedWallet) {
-                try {
-                    const parsedData = JSON.parse(savedWallet);
-                    applyWalletSession(parsedData);
-                } catch (e) {
-                    console.error('Error parsing saved wallet', e);
+        // Auto-Connect Lifecycle Hook on initial window load
+        window.addEventListener('load', () => {
+            const wasConnected = localStorage.getItem('wallet_connected_flag');
+            const savedPubKey = localStorage.getItem('wallet_pubkey');
+            if (wasConnected === 'true') {
+                connectWallet(true); // Triggers silent auto-connect
+                if (savedPubKey) {
+                    updateUIConnected(savedPubKey);
                 }
             }
         });
