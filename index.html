@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robust Wallet Connection</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #121214;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #1a1a1e;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #2a2a30;
+        }
+        h2 { margin-bottom: 1.5rem; font-weight: 600; }
+        .btn {
+            background-color: #512da8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+        .btn:hover { background-color: #673ab7; transform: translateY(-1px); }
+        .btn:disabled { background-color: #3a3a40; color: #7a7a80; cursor: not-allowed; transform: none; }
+        .btn-disconnect {
+            background-color: transparent;
+            color: #ef5350;
+            border: 1px solid #ef5350;
+            margin-top: 10px;
+        }
+        .btn-disconnect:hover { background-color: rgba(239, 83, 80, 0.1); }
+        .status-box {
+            margin-top: 1.5rem;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            word-break: break-all;
+            display: none;
+        }
+        .success { background-color: rgba(76, 175, 80, 0.1); color: #4caf50; border: 1px solid #4caf50; }
+        .info { background-color: rgba(33, 150, 243, 0.1); color: #2196f3; border: 1px solid #2196f3; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 id="title">Wallet Connection</h2>
+        <button id="connectBtn" class="btn">Detect & Connect Wallet</button>
+        <button id="disconnectBtn" class="btn btn-disconnect hidden">Disconnect</button>
+        <div id="status" class="status-box"></div>
+    </div>
+
+    <script>
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const statusBox = document.getElementById('status');
+        const title = document.getElementById('title');
+
+        // Check if a standard browser extension is available (Defaulting to Solana/Phantom provider style)
+        function getProvider() {
+            if ('solana' in window) {
+                const provider = window.solana;
+                if (provider.isPhantom || provider) {
+                    return provider;
+                }
+            }
+            // Fallback checking for other injected wallets
+            if (window.solflare) return window.solflare;
+            return null;
+        }
+
+        function updateUIConnected(publicKey) {
+            const shortAddress = `${publicKey.substring(0, 4)}...${publicKey.substring(publicKey.length - 4)}`;
+            title.innerText = "Wallet Active";
+            
+            statusBox.className = "status-box success";
+            statusBox.style.display = "block";
+            statusBox.innerHTML = `<strong>🟢 Connection Successful!</strong><br>Address: ${shortAddress}`;
+            
+            connectBtn.innerText = "Wallet Connected";
+            connectBtn.disabled = true;
+            disconnectBtn.classList.remove('hidden');
+        }
+
+        function updateUIDisconnected() {
+            title.innerText = "Wallet Connection";
+            statusBox.style.display = "none";
+            connectBtn.innerText = "Detect & Connect Wallet";
+            connectBtn.disabled = false;
+            disconnectBtn.classList.add('hidden');
+        }
+
+        // Robust Connection Handler
+        async function connectWallet(e, isAutoConnect = false) {
+            const provider = getProvider();
+
+            if (!provider) {
+                statusBox.className = "status-box info";
+                statusBox.style.display = "block";
+                statusBox.innerHTML = "❌ No extension wallet detected. Please install Phantom or Solflare.";
+                return;
+            }
+
+            try {
+                // If it's an auto-connect attempt, tell the wallet to connect silently
+                const resp = await provider.connect(isAutoConnect ? { onlyIfTrusted: true } : {});
+                const pubKey = resp.publicKey ? resp.publicKey.toString() : provider.publicKey?.toString();
+                
+                if (pubKey) {
+                    localStorage.setItem('wallet_connected_flag', 'true');
+                    updateUIConnected(pubKey);
+                }
+            } catch (err) {
+                // User rejected or auto-connect failed silently
+                if (!isAutoConnect) {
+                    statusBox.className = "status-box info";
+                    statusBox.style.display = "block";
+                    statusBox.innerText = `Connection error: ${err.message}`;
+                }
+                console.warn("Wallet connection attempt evaluated:", err.message);
+            }
+        }
+
+        // Disconnect Handler
+        async function disconnectWallet() {
+            const provider = getProvider();
+            if (provider && provider.disconnect) {
+                await provider.disconnect();
+            }
+            localStorage.removeItem('wallet_connected_flag');
+            updateUIDisconnected();
+        }
+
+        // Event Listeners
+        connectBtn.addEventListener('click', (e) => connectWallet(e, false));
+        disconnectBtn.addEventListener('click', disconnectWallet);
+
+        // Auto-Connect Loop (Triggers automatically when the page loads)
+        window.addEventListener('load', () => {
+            const wasConnected = localStorage.getItem('wallet_connected_flag');
+            if (wasConnected === 'true') {
+                // Attempt a silent auto-connection
+                connectWallet(null, true);
+            }
+        });
+    </script>
+</body>
+</html>
