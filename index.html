@@ -2486,10 +2486,22 @@
         // Solana Web3 SDK is loaded as an ES module so this standalone HTML file
         // can use real Devnet RPC calls without a bundler.
         import * as solanaWeb3 from 'https://esm.sh/@solana/web3.js@1.98.4';
-        // Irys browser uploader. It uses the already-connected Solana wallet provider
-        // to authorize/sign Irys upload transactions; no private key is ever handled here.
-        import { WebUploader } from 'https://esm.sh/@irys/web-upload@0.0.15';
-        import { WebSolana } from 'https://esm.sh/@irys/web-upload-solana@0.1.8';
+        // Irys is intentionally loaded lazily. A broken/slow third-party Irys module
+        // must never prevent the dashboard and intro screen from initializing.
+        let irysModulesPromise = null;
+
+        async function loadIrysModules() {
+            if (!irysModulesPromise) {
+                irysModulesPromise = Promise.all([
+                    import('https://cdn.jsdelivr.net/npm/@irys/web-upload@0.0.15/+esm'),
+                    import('https://cdn.jsdelivr.net/npm/@irys/web-upload-solana@0.1.8/+esm')
+                ]).then(([webUpload, solanaUpload]) => ({
+                    WebUploader: webUpload.WebUploader,
+                    WebSolana: solanaUpload.WebSolana
+                }));
+            }
+            return irysModulesPromise;
+        }
 
         // Intro Screen Timer
         setTimeout(() => {
@@ -2725,6 +2737,11 @@
             // Rebuild when the connected provider/account changes.
             if (irysUploader && irysUploaderAddress === activePublicKey.toString()) {
                 return irysUploader;
+            }
+
+            const { WebUploader, WebSolana } = await loadIrysModules();
+            if (typeof WebUploader !== 'function' || typeof WebSolana !== 'function') {
+                throw new Error('Irys browser modules loaded without the expected Solana uploader exports.');
             }
 
             irysUploader = await WebUploader(WebSolana)
