@@ -2491,57 +2491,73 @@
         // Solana Web3 SDK is loaded as an ES module so this standalone HTML file
         // can use real Devnet RPC calls without a bundler.
         import * as solanaWeb3 from 'https://esm.sh/@solana/web3.js@1.98.4';
-        // Irys is intentionally loaded lazily. A broken/slow third-party Irys module
-        // must never prevent the dashboard and intro screen from initializing.
-        // The Solana web adapter is kept on the 0.1.7 line alongside web-upload 0.0.14
-        // to avoid the dependency/export mismatch seen with newer combinations.
-        let irysModulesPromise = null;
 
-        async function importFirstWorking(candidates, label) {
+        // --- FIXED IRYS INTEGRATION using @irys/sdk (no PassThrough error) ---
+        let irysInstance = null;
+        let irysInstanceOwner = null;
+
+        async function loadIrysSDK() {
+            const candidates = [
+                'https://esm.sh/@irys/sdk@0.2.0?bundle',
+                'https://cdn.jsdelivr.net/npm/@irys/sdk@0.2.0/+esm'
+            ];
             const errors = [];
             for (const url of candidates) {
                 try {
-                    return await import(url);
-                } catch (error) {
-                    errors.push(`${url}: ${error?.message || error}`);
+                    const module = await import(url);
+                    if (module.Irys) {
+                        return module.Irys;
+                    }
+                } catch (e) {
+                    errors.push(`${url}: ${e.message}`);
                 }
             }
-            throw new Error(`Unable to load ${label}.
-${errors.join('\n')}`);
+            throw new Error(`Unable to load @irys/sdk.\n${errors.join('\n')}`);
         }
 
-        async function loadIrysModules() {
-            if (!irysModulesPromise) {
-                irysModulesPromise = (async () => {
-                    const webUpload = await importFirstWorking([
-                        'https://esm.sh/@irys/web-upload@0.0.14?target=es2020&bundle',
-                        'https://cdn.jsdelivr.net/npm/@irys/web-upload@0.0.14/+esm'
-                    ], 'Irys web-upload');
-
-                    const solanaUpload = await importFirstWorking([
-                        'https://esm.sh/@irys/web-upload-solana@0.1.7?target=es2020&bundle',
-                        'https://cdn.jsdelivr.net/npm/@irys/web-upload-solana@0.1.7/+esm'
-                    ], 'Irys Solana web adapter');
-
-                    if (typeof webUpload.WebUploader !== 'function') {
-                        throw new Error('Irys web-upload module did not expose WebUploader.');
-                    }
-                    if (typeof solanaUpload.WebSolana !== 'function') {
-                        throw new Error('Irys Solana adapter did not expose WebSolana.');
-                    }
-
-                    return {
-                        WebUploader: webUpload.WebUploader,
-                        WebSolana: solanaUpload.WebSolana
-                    };
-                })().catch(error => {
-                    // Allow a later retry after a transient CDN/network failure.
-                    irysModulesPromise = null;
-                    throw error;
-                });
+        async function getIrysInstance() {
+            if (!activeProvider || !activePublicKey) {
+                throw new Error('Connect a Solana wallet before uploading.');
             }
-            return irysModulesPromise;
+
+            const ownerKey = activePublicKey.toString();
+            if (irysInstance && irysInstanceOwner === ownerKey) {
+                return irysInstance;
+            }
+
+            const Irys = await loadIrysSDK();
+            const irys = new Irys({
+                network: 'devnet',
+                token: 'solana',
+                wallet: { provider: activeProvider },
+                rpcUrl: DEVNET_RPC,
+            });
+
+            irysInstance = irys;
+            irysInstanceOwner = ownerKey;
+            return irysInstance;
         }
+
+        async function uploadTokenImageToIrys(file) {
+            const irys = await getIrysInstance();
+            const tags = [
+                { name: 'application-id', value: 'ConfluenceTokenLaunch' },
+                { name: 'Content-Type', value: file.type || 'application/octet-stream' }
+            ];
+
+            const receipt = await irys.uploadFile(file, { tags });
+
+            if (!receipt?.id) {
+                throw new Error('Irys upload completed without a transaction ID.');
+            }
+
+            return {
+                id: receipt.id,
+                url: `https://gateway.irys.xyz/${receipt.id}`,
+                signature: receipt.signature || null
+            };
+        }
+        // --- END IRYS FIX ---
 
         // Intro Screen Timer
         setTimeout(() => {
@@ -2768,63 +2784,6 @@ ${errors.join('\n')}`);
                 }
             }
         });
-
-        // --- Irys-backed token launch preparation ---
-        // The image is uploaded only when the user presses Launch Token. Irys uses
-        // the currently connected wallet provider to request the required signature.
-        let irysUploader = null;
-        let irysUploaderAddress = null;
-
-        async function getIrysUploader() {
-            if (!activeProvider || !activePublicKey) {
-                throw new Error('Connect a Solana wallet before launching a token.');
-            }
-
-            // Rebuild when the connected provider/account changes.
-            if (irysUploader && irysUploaderAddress === activePublicKey.toString()) {
-                return irysUploader;
-            }
-
-            const { WebUploader, WebSolana } = await loadIrysModules();
-            if (typeof WebUploader !== 'function' || typeof WebSolana !== 'function') {
-                throw new Error('Irys browser modules loaded without the expected Solana uploader exports.');
-            }
-
-            const builder = WebUploader(WebSolana).withProvider(activeProvider);
-            if (typeof builder.withRpc !== 'function' || typeof builder.devnet !== 'function') {
-                throw new Error('The Irys browser SDK loaded, but its Devnet builder API is unavailable.');
-            }
-            irysUploader = await builder
-                .withRpc(DEVNET_RPC)
-                .devnet();
-
-            irysUploaderAddress = activePublicKey.toString();
-            return irysUploader;
-        }
-
-        async function uploadTokenImageToIrys(file) {
-            const uploader = await getIrysUploader();
-
-            // Irys automatically handles the file content type, but explicitly tagging
-            // it makes the resulting gateway URL reliably render as an image.
-            const tags = [
-                { name: 'application-id', value: 'ConfluenceTokenLaunch' },
-                { name: 'Content-Type', value: file.type || 'application/octet-stream' }
-            ];
-
-            // Browser uploads are signed by the wallet provider passed above.
-            const receipt = await uploader.upload(file, { tags });
-
-            if (!receipt?.id) {
-                throw new Error('Irys upload completed without a transaction ID.');
-            }
-
-            return {
-                id: receipt.id,
-                url: `https://gateway.irys.xyz/${receipt.id}`,
-                signature: receipt.signature || null
-            };
-        }
 
         function setLaunchButtonBusy(isBusy, label = 'Launch Token') {
             wizardLaunchBtn.disabled = isBusy;
@@ -3118,8 +3077,8 @@ ${errors.join('\n')}`);
                         new solanaWeb3.PublicKey(publicKey.toString());
 
                     // Force Irys to bind to the newly selected wallet account.
-                    irysUploader = null;
-                    irysUploaderAddress = null;
+                    irysInstance = null;
+                    irysInstanceOwner = null;
 
                     const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
                     applyWalletSession({
@@ -3150,8 +3109,8 @@ ${errors.join('\n')}`);
 
             activeProvider = provider;
             activeWalletName = walletName;
-            irysUploader = null;
-            irysUploaderAddress = null;
+            irysInstance = null;
+            irysInstanceOwner = null;
             activePublicKey = publicKeyValue instanceof solanaWeb3.PublicKey ?
                 publicKeyValue :
                 new solanaWeb3.PublicKey(publicKeyValue.toString());
@@ -3281,8 +3240,8 @@ ${errors.join('\n')}`);
             activeProvider = null;
             activeWalletName = null;
             activePublicKey = null;
-            irysUploader = null;
-            irysUploaderAddress = null;
+            irysInstance = null;
+            irysInstanceOwner = null;
             localStorage.removeItem(WALLET_CONNECTED_FLAG);
 
             resetWalletUI();
