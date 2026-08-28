@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CONFLUENCE App Intro & Dashboard</title>
+    <!-- Import Vipnagorgialla font -->
     <link href="https://fonts.cdnfonts.com/css/vipnagorgialla" rel="stylesheet">
     <style>
         /* --- RESET & BASE --- */
@@ -12,6 +13,7 @@
             padding: 0;
             box-sizing: border-box;
         }
+
         html,
         body {
             height: 100%;
@@ -23,6 +25,7 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
         html::-webkit-scrollbar,
         body::-webkit-scrollbar {
             display: none;
@@ -39,6 +42,7 @@
             background-color: #000000;
             transition: opacity 0.5s ease;
         }
+
         .intro-banner {
             opacity: 0;
             filter: blur(20px);
@@ -48,6 +52,7 @@
             height: auto;
             object-fit: contain;
         }
+
         @keyframes blurInAnimation {
             from {
                 opacity: 0;
@@ -71,6 +76,7 @@
             z-index: 1;
             overflow: hidden;
         }
+
         .dashboard-container.blurred {
             filter: blur(8px);
             pointer-events: none;
@@ -78,7 +84,7 @@
             transition: filter 0.3s ease;
         }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR — FULLY ROUNDED & FOLDABLE --- */
         .sidebar {
             position: absolute;
             top: 20px;
@@ -88,6 +94,7 @@
             z-index: 100;
             transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         .sidebar-inner {
             width: 100%;
             height: 100%;
@@ -102,13 +109,17 @@
             box-sizing: border-box;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
+
         .sidebar:hover {
             width: 260px;
         }
+
         .sidebar:hover .sidebar-inner {
             background-color: #2a2a2a;
             box-shadow: 0 0 40px rgba(255, 255, 255, 0.06), 0 10px 30px rgba(0, 0, 0, 0.9);
         }
+
+        /* --- SIDEBAR HEADER --- */
         .sidebar-header {
             display: flex;
             align-items: center;
@@ -118,6 +129,7 @@
             overflow: hidden;
             flex-shrink: 0;
         }
+
         .brand-logo {
             width: 35px;
             height: auto;
@@ -125,6 +137,7 @@
             flex-shrink: 0;
             transition: filter 0.3s ease;
         }
+
         .brand-title-img {
             margin-left: 12px;
             height: 24px;
@@ -134,13 +147,17 @@
             white-space: nowrap;
             transition: opacity 0.25s ease 0.1s, filter 0.3s ease;
         }
+
         .sidebar:hover .brand-title-img {
             opacity: 1;
         }
+
         .sidebar:hover .brand-logo,
         .sidebar:hover .brand-title-img {
             filter: brightness(1.2);
         }
+
+        /* --- SIDEBAR DIVIDER --- */
         .sidebar-divider {
             width: calc(100% - 32px);
             margin: 12px 16px 14px 16px;
@@ -150,6 +167,8 @@
             flex-shrink: 0;
             transition: opacity 0.3s ease;
         }
+
+        /* --- SIDEBAR NAVIGATION --- */
         .sidebar-nav {
             width: 100%;
             padding: 0 12px;
@@ -159,9 +178,11 @@
             flex-direction: column;
             gap: 4px;
         }
+
         .nav-spacer {
             flex: 1;
         }
+
         .nav-item {
             display: flex;
             align-items: center;
@@ -174,6 +195,7 @@
             overflow: hidden;
             white-space: nowrap;
         }
+
         .nav-item .nav-icon {
             display: flex;
             align-items: center;
@@ -184,6 +206,7 @@
             color: #9a9a9a;
             transition: color 0.2s ease;
         }
+
         .nav-item .nav-icon svg {
             width: 24px;
             height: 24px;
@@ -191,6 +214,7 @@
             stroke: currentColor;
             fill: none;
         }
+
         .nav-item .nav-text {
             margin-left: 14px;
             font-size: 15px;
@@ -199,9 +223,11 @@
             transition: opacity 0.2s ease 0.1s, color 0.2s ease;
             color: #cccccc;
         }
+
         .sidebar:hover .nav-item .nav-text {
             opacity: 1;
         }
+
         .nav-item.active .nav-text {
             background: linear-gradient(to right, #4A90E2, #ffffff);
             -webkit-background-clip: text;
@@ -209,16 +235,20 @@
             background-clip: text;
             color: transparent;
         }
+
         .nav-item.active .nav-icon {
             color: #5B9BF5;
         }
+
         .nav-item.active {
             background-color: rgba(75, 140, 255, 0.12);
         }
+
         .nav-item:hover {
             background-color: #3d3d3d;
             color: #ffffff;
         }
+
         .nav-item:hover .nav-icon {
             color: #ffffff;
         }
@@ -235,11 +265,12 @@
             filter: blur(0px);
             overflow: hidden;
         }
+
         .sidebar:hover~.dashboard-content {
             filter: blur(6px);
         }
 
-        /* --- TOP BAR --- */
+        /* --- TOP BAR (SEARCH + RIGHT ACTIONS) --- */
         .top-bar {
             display: flex;
             align-items: center;
@@ -249,6 +280,8 @@
             margin-bottom: 24px;
             flex-shrink: 0;
         }
+
+        /* SEARCH BAR */
         .search-bar {
             display: flex;
             align-items: center;
@@ -260,6 +293,7 @@
             gap: 10px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
         }
+
         .search-bar .search-icon {
             display: flex;
             align-items: center;
@@ -267,10 +301,12 @@
             color: #888888;
             flex-shrink: 0;
         }
+
         .search-bar .search-icon svg {
             width: 20px;
             height: 20px;
         }
+
         .search-bar input {
             flex: 1;
             background: transparent;
@@ -282,9 +318,11 @@
             padding: 4px 0;
             font-family: inherit;
         }
+
         .search-bar input::placeholder {
             color: #6b6b6b;
         }
+
         .search-bar .shortcut-hint {
             color: #4a4a4a;
             font-size: 12px;
@@ -292,12 +330,15 @@
             padding: 2px 8px;
             border-radius: 12px;
         }
+
+        /* TOP RIGHT CONTROLS */
         .header-actions {
             display: flex;
             align-items: center;
             gap: 12px;
             position: relative;
         }
+
         .btn-action {
             display: inline-flex;
             align-items: center;
@@ -312,10 +353,12 @@
             cursor: pointer;
             transition: background-color 0.2s ease, border-color 0.2s ease;
         }
+
         .btn-action:hover {
             background-color: #2a2a2a;
             border-color: #444444;
         }
+
         .btn-action svg {
             width: 18px;
             height: 18px;
@@ -323,6 +366,8 @@
             stroke: currentColor;
             fill: none;
         }
+
+        /* Wallet Balance Badge */
         .wallet-balance-badge {
             display: inline-flex;
             align-items: center;
@@ -334,8 +379,8 @@
             font-size: 14px;
             font-weight: 600;
             color: #10B981;
-            cursor: default;
         }
+
         .wallet-balance-badge svg {
             width: 18px;
             height: 18px;
@@ -343,6 +388,8 @@
             fill: none;
             stroke-width: 2;
         }
+
+        /* Profile Button */
         .profile-btn {
             display: flex;
             align-items: center;
@@ -357,10 +404,12 @@
             transition: background-color 0.2s ease, border-color 0.2s ease;
             position: relative;
         }
+
         .profile-btn:hover {
             background-color: #2a2a2a;
             border-color: #555555;
         }
+
         .profile-btn svg {
             width: 20px;
             height: 20px;
@@ -368,6 +417,8 @@
             stroke: currentColor;
             fill: none;
         }
+
+        /* Profile Popover / Dropdown */
         .profile-popover {
             position: absolute;
             top: 50px;
@@ -383,21 +434,19 @@
             gap: 12px;
             z-index: 200;
         }
+
         .profile-popover.show {
             display: flex;
         }
+
         .popover-header {
             font-size: 13px;
             font-weight: 600;
             color: #888888;
             border-bottom: 1px solid #222222;
             padding-bottom: 8px;
-            cursor: pointer;
-            transition: color 0.2s ease;
         }
-        .popover-header:hover {
-            color: #ffffff;
-        }
+
         .popover-balance-row {
             display: flex;
             justify-content: space-between;
@@ -405,73 +454,13 @@
             font-size: 14px;
             font-weight: 500;
         }
+
         .popover-balance-row span:last-child {
             color: #10B981;
             font-weight: 700;
         }
 
-        /* --- TOAST --- */
-        .toast-container {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-        .toast {
-            pointer-events: auto;
-            background: rgba(20, 20, 20, 0.92);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 40px;
-            padding: 12px 24px;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
-            animation: toastIn 0.3s ease-out forwards;
-            min-width: 200px;
-            justify-content: center;
-        }
-        .toast .toast-check {
-            color: #10B981;
-            font-size: 18px;
-            font-weight: 700;
-        }
-        .toast.out {
-            animation: toastOut 0.25s ease-in forwards;
-        }
-        @keyframes toastIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        @keyframes toastOut {
-            from {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            to {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-        }
-
-        /* --- TABS --- */
+        /* --- STYLED TABS / HEADERS --- */
         .dashboard-tabs {
             display: flex;
             align-items: center;
@@ -479,6 +468,7 @@
             margin-bottom: 20px;
             flex-shrink: 0;
         }
+
         .tab-btn {
             background: none;
             border: none;
@@ -496,6 +486,7 @@
             opacity: 0.45;
             transition: opacity 0.25s ease, transform 0.2s ease;
         }
+
         .tab-btn.active {
             background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
             -webkit-background-clip: text;
@@ -503,6 +494,7 @@
             background-clip: text;
             opacity: 1;
         }
+
         .tab-btn.active::after {
             content: '';
             position: absolute;
@@ -513,10 +505,12 @@
             background: linear-gradient(90deg, #0052D4, #6FB1FC);
             border-radius: 2px;
         }
+
         .tab-btn:hover:not(.active) {
             opacity: 0.85;
         }
 
+        /* --- SUBSECTION HEADER --- */
         .subsection-header {
             font-family: 'Vipnagorgialla', 'Segoe UI', sans-serif;
             font-size: 15px;
@@ -527,7 +521,7 @@
             text-align: left;
         }
 
-        /* --- WORKSPACE --- */
+        /* --- WORKSPACE & HORIZONTAL SCROLLABLE CARDS --- */
         .workspace-content {
             flex: 1;
             display: flex;
@@ -542,11 +536,13 @@
             width: 100%;
             overflow: hidden;
         }
+
         .tab-view {
             display: none;
             width: 100%;
             height: 100%;
         }
+
         .tab-view.active-view {
             display: flex;
             flex-direction: column;
@@ -556,11 +552,12 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
         .tab-view.active-view::-webkit-scrollbar {
             display: none;
         }
 
-        /* --- CARDS ROW --- */
+        /* Cards Row Container (Hide Scrollbar) */
         .cards-row-container {
             display: flex;
             gap: 16px;
@@ -571,9 +568,12 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
         .cards-row-container::-webkit-scrollbar {
             display: none;
         }
+
+        /* Individual Card - Unframed top half */
         .card {
             width: 250px;
             min-width: 250px;
@@ -587,10 +587,13 @@
             flex-direction: column;
             transition: border-color 0.2s ease, transform 0.2s ease;
         }
+
         .card:hover {
             border-color: #333333;
             transform: translateY(-2px);
         }
+
+        /* 5:3 Ratio Flush Edge-to-Edge Loading Area */
         .card-frame {
             width: 100%;
             aspect-ratio: 5 / 3;
@@ -598,6 +601,7 @@
             background-size: 200% 100%;
             animation: loadingGradient 1.5s infinite;
         }
+
         @keyframes loadingGradient {
             0% {
                 background-position: 200% 0;
@@ -606,28 +610,34 @@
                 background-position: -200% 0;
             }
         }
+
+        /* Card Content Details */
         .card-details {
             padding: 12px;
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
+
         .card-meta-top {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
+
         .card-ticker {
             font-size: 14px;
             font-weight: 700;
             color: #ffffff;
             letter-spacing: 0.5px;
         }
+
         .card-mc {
             font-size: 13px;
             font-weight: 700;
             color: #10B981;
         }
+
         .card-creator {
             display: flex;
             align-items: center;
@@ -635,6 +645,7 @@
             color: #9a9a9a;
             font-size: 12px;
         }
+
         .creator-icon {
             width: 16px;
             height: 16px;
@@ -645,6 +656,7 @@
             justify-content: center;
             flex-shrink: 0;
         }
+
         .creator-icon svg {
             width: 10px;
             height: 10px;
@@ -652,6 +664,8 @@
             stroke-width: 2;
             fill: none;
         }
+
+        /* Metadata Fineprint with Purple-Pink Gradient */
         .card-description {
             font-size: 12px;
             line-height: 1.4;
@@ -661,6 +675,7 @@
             background-clip: text;
             color: transparent;
         }
+
         .btn-read-more {
             background: none;
             border: none;
@@ -678,143 +693,12 @@
             text-decoration: underline;
             text-decoration-color: #f472b6;
         }
+
         .btn-read-more:hover {
             opacity: 0.8;
         }
 
-        /* --- INDEX GRID --- */
-        .index-regulars-wrapper {
-            width: 100%;
-            margin-top: 20px;
-            display: flex;
-            justify-content: flex-start;
-            flex-shrink: 0;
-            padding-bottom: 24px;
-        }
-        .index-regulars-inner {
-            width: 100%;
-        }
-        .index-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 16px;
-            width: 100%;
-        }
-        .index-card {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-        .index-card-frame {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            border-radius: 8px;
-            background: linear-gradient(90deg, #181818 25%, #2a2a2a 50%, #181818 75%);
-            background-size: 200% 100%;
-            animation: loadingGradient 1.5s infinite;
-            border: 1px solid #222222;
-        }
-        .index-card-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            padding-top: 2px;
-        }
-        .index-token-name {
-            font-size: 15px;
-            font-weight: 700;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            line-height: 1.2;
-        }
-        .index-ticker {
-            font-size: 13px;
-            font-weight: 600;
-            color: #6e7681;
-        }
-        .index-mc-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin: 3px 0;
-        }
-        .index-mc-badge {
-            background-color: #1a1a1a;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 13px;
-            padding: 2px 6px;
-            border-radius: 5px;
-            border: 1px solid #2a2a2a;
-        }
-        .index-mc-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #6e7681;
-        }
-        .index-creator-row {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            color: #8b949e;
-            margin-top: 1px;
-        }
-        .index-creator-avatar {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-        .index-creator-avatar svg {
-            width: 10px;
-            height: 10px;
-            stroke: #181818;
-            stroke-width: 2;
-            fill: none;
-        }
-        .index-creator-name {
-            font-size: 13px;
-            color: #8b949e;
-            font-weight: 400;
-        }
-        .index-age-wrap {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #10B981;
-            margin-left: 2px;
-        }
-        .seed-icon-svg {
-            width: 13px;
-            height: 13px;
-            stroke: #10B981;
-            fill: none;
-            stroke-width: 2;
-        }
-        .index-meta-footer {
-            font-size: 12px;
-            color: #444444;
-            margin-top: 1px;
-        }
-        .portfolio-value {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 38px;
-            font-weight: 900;
-            color: #10B981;
-            letter-spacing: 0.5px;
-        }
-
-        /* --- TAB LOADER --- */
+        /* --- FAKE TAB LOADING SPINNER --- */
         .tab-loader {
             position: absolute;
             top: 40%;
@@ -826,9 +710,11 @@
             gap: 12px;
             color: #4364F7;
         }
+
         .tab-loader.show {
             display: flex;
         }
+
         .spinner {
             width: 32px;
             height: 32px;
@@ -837,6 +723,7 @@
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
         }
+
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -846,7 +733,152 @@
             }
         }
 
-        /* --- WALLET MODAL --- */
+        /* --- INDEX REGULARS SECTION --- */
+        .index-regulars-wrapper {
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-start;
+            flex-shrink: 0;
+            padding-bottom: 24px;
+        }
+
+        .index-regulars-inner {
+            width: 100%;
+        }
+
+        /* 5 Column Downward Grid Layout */
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            width: 100%;
+        }
+
+        .index-card {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        /* 1:1 Square Frame */
+        .index-card-frame {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #181818 25%, #2a2a2a 50%, #181818 75%);
+            background-size: 200% 100%;
+            animation: loadingGradient 1.5s infinite;
+            border: 1px solid #222222;
+        }
+
+        /* --- NEW INDEX CARD METADATA STYLES --- */
+        .index-card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding-top: 2px;
+        }
+
+        .index-token-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            line-height: 1.2;
+        }
+
+        .index-ticker {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6e7681;
+        }
+
+        .index-mc-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 3px 0;
+        }
+
+        .index-mc-badge {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 2px 6px;
+            border-radius: 5px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .index-mc-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6e7681;
+        }
+
+        .index-creator-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #8b949e;
+            margin-top: 1px;
+        }
+
+        .index-creator-avatar {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .index-creator-avatar svg {
+            width: 10px;
+            height: 10px;
+            stroke: #181818;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .index-creator-name {
+            font-size: 13px;
+            color: #8b949e;
+            font-weight: 400;
+        }
+
+        .index-age-wrap {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #10B981;
+            margin-left: 2px;
+        }
+
+        .seed-icon-svg {
+            width: 13px;
+            height: 13px;
+            stroke: #10B981;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .index-meta-footer {
+            font-size: 12px;
+            color: #444444;
+            margin-top: 1px;
+        }
+
+        /* --- WALLET CONNECT MODAL & 5:3 FRAME OVERLAY --- */
         .wallet-modal-overlay {
             position: fixed;
             inset: 0;
@@ -856,9 +888,11 @@
             justify-content: center;
             align-items: center;
         }
+
         .wallet-modal-overlay.show {
             display: flex;
         }
+
         .wallet-modal-frame {
             width: 100%;
             max-width: 540px;
@@ -873,6 +907,7 @@
             justify-content: space-between;
             position: relative;
         }
+
         .wallet-modal-title {
             font-family: 'Vipnagorgialla', 'Segoe UI', sans-serif;
             font-size: 22px;
@@ -882,6 +917,7 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .wallet-modal-body {
             font-size: 13.5px;
             line-height: 1.5;
@@ -890,9 +926,11 @@
             flex-direction: column;
             gap: 10px;
         }
+
         .wallet-modal-body p strong {
             color: #ffffff;
         }
+
         .wallet-disclaimer {
             font-size: 11.5px;
             color: #888888;
@@ -901,11 +939,13 @@
             padding: 10px;
             border-radius: 10px;
         }
+
         .wallet-modal-footer {
             display: flex;
             justify-content: flex-end;
             gap: 12px;
         }
+
         .btn-modal-cancel {
             background: transparent;
             border: 1px solid #333333;
@@ -917,10 +957,12 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .btn-modal-cancel:hover {
             background: #222222;
             color: #ffffff;
         }
+
         .btn-modal-primary {
             background: linear-gradient(135deg, #0052D4 0%, #4364F7 100%);
             border: none;
@@ -932,9 +974,12 @@
             cursor: pointer;
             transition: opacity 0.2s ease;
         }
+
         .btn-modal-primary:hover {
             opacity: 0.9;
         }
+
+        /* Scanner & Wallet Selection Module */
         .wallet-scanner-content,
         .wallet-list-content {
             display: none;
@@ -942,6 +987,7 @@
             height: 100%;
             justify-content: space-between;
         }
+
         .scanner-loader-wrap {
             display: flex;
             flex-direction: column;
@@ -951,6 +997,7 @@
             gap: 16px;
             color: #4364F7;
         }
+
         .wallet-options-list {
             display: flex;
             flex-direction: column;
@@ -961,9 +1008,11 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
         .wallet-options-list::-webkit-scrollbar {
             display: none;
         }
+
         .wallet-option-item {
             display: flex;
             align-items: center;
@@ -975,15 +1024,18 @@
             cursor: pointer;
             transition: border-color 0.2s ease, background-color 0.2s ease;
         }
+
         .wallet-option-item:hover {
             border-color: #4364F7;
             background-color: #222222;
         }
+
         .wallet-option-info {
             display: flex;
             align-items: center;
             gap: 12px;
         }
+
         .wallet-option-icon {
             width: 28px;
             height: 28px;
@@ -996,11 +1048,13 @@
             font-size: 12px;
             color: #fff;
         }
+
         .wallet-option-name {
             font-size: 14px;
             font-weight: 600;
             color: #ffffff;
         }
+
         .wallet-detected-badge {
             font-size: 11px;
             font-weight: 600;
@@ -1010,6 +1064,17 @@
             padding: 3px 8px;
             border-radius: 20px;
         }
+
+        /* --- PORTFOLIO VALUE STYLING — NORMAL SUPER BOLD --- */
+        .portfolio-value {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 38px;
+            font-weight: 900;
+            color: #10B981;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- DISCONNECT BUTTON INSIDE POPOVER --- */
         #disconnectWalletBtn {
             width: 100%;
             margin-top: 4px;
@@ -1024,12 +1089,13 @@
             font-size: 13px;
             transition: background 0.2s ease, border-color 0.2s ease;
         }
+
         #disconnectWalletBtn:hover {
             background: #2a1a1a;
             border-color: #e74c3c;
         }
 
-        /* --- TOKEN WIZARD --- */
+        /* ===== TOKEN CREATION WIZARD ===== */
         .token-wizard-view {
             display: none;
             flex-direction: column;
@@ -1041,12 +1107,15 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
         .token-wizard-view::-webkit-scrollbar {
             display: none;
         }
+
         .token-wizard-view.active-view {
             display: flex;
         }
+
         .wizard-header {
             display: flex;
             align-items: center;
@@ -1057,6 +1126,7 @@
             flex-shrink: 0;
             width: 100%;
         }
+
         .wizard-header h1 {
             font-family: 'Vipnagorgialla', 'Segoe UI', sans-serif;
             font-size: 28px;
@@ -1067,6 +1137,7 @@
             background-clip: text;
             letter-spacing: 1px;
         }
+
         .wizard-header .wizard-back-btn {
             background: none;
             border: none;
@@ -1081,10 +1152,12 @@
             padding: 6px 12px;
             border-radius: 8px;
         }
+
         .wizard-header .wizard-back-btn:hover {
             color: #ffffff;
             background: #2a2a2a;
         }
+
         .wizard-header .wizard-back-btn svg {
             width: 20px;
             height: 20px;
@@ -1092,6 +1165,7 @@
             stroke-width: 2;
             fill: none;
         }
+
         .wizard-body {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1100,21 +1174,25 @@
             flex: 1;
             align-content: start;
         }
+
         .wizard-left {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
+
         .wizard-right {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
+
         .form-group {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
+
         .form-group label {
             font-size: 13px;
             font-weight: 600;
@@ -1122,6 +1200,7 @@
             letter-spacing: 0.3px;
             text-transform: uppercase;
         }
+
         .form-group .form-input {
             background-color: #141414;
             border: 1px solid #2a2a2a;
@@ -1135,19 +1214,23 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             width: 100%;
         }
+
         .form-group .form-input:focus {
             border-color: #4364F7;
             box-shadow: 0 0 0 3px rgba(67, 100, 247, 0.15);
         }
+
         .form-group .form-input::placeholder {
             color: #555555;
         }
+
         .form-group .form-input.textarea-input {
             resize: vertical;
             min-height: 100px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* Image Upload Area */
         .image-upload-area {
             background-color: #141414;
             border: 2px dashed #2a2a2a;
@@ -1164,17 +1247,21 @@
             position: relative;
             overflow: hidden;
         }
+
         .image-upload-area:hover {
             border-color: #4364F7;
             background-color: #1a1a1a;
         }
+
         .image-upload-area .upload-icon {
             color: #555555;
             transition: color 0.25s ease;
         }
+
         .image-upload-area:hover .upload-icon {
             color: #6FB1FC;
         }
+
         .image-upload-area .upload-icon svg {
             width: 48px;
             height: 48px;
@@ -1182,17 +1269,20 @@
             stroke-width: 1.5;
             fill: none;
         }
+
         .image-upload-area .upload-text {
             font-size: 14px;
             font-weight: 500;
             color: #888888;
             text-align: center;
         }
+
         .image-upload-area .upload-sub {
             font-size: 12px;
             color: #555555;
             text-align: center;
         }
+
         .image-upload-area .image-preview {
             position: absolute;
             inset: 0;
@@ -1202,14 +1292,17 @@
             border-radius: 14px;
             display: none;
         }
+
         .image-upload-area.has-image .image-preview {
             display: block;
         }
+
         .image-upload-area.has-image .upload-icon,
         .image-upload-area.has-image .upload-text,
         .image-upload-area.has-image .upload-sub {
             display: none;
         }
+
         .image-upload-area .remove-image-btn {
             position: absolute;
             top: 10px;
@@ -1227,13 +1320,16 @@
             transition: background 0.2s ease;
             z-index: 5;
         }
+
         .image-upload-area.has-image .remove-image-btn {
             display: flex;
         }
+
         .image-upload-area .remove-image-btn:hover {
             background: #2a1a1a;
             border-color: #e74c3c;
         }
+
         .image-upload-area .remove-image-btn svg {
             width: 16px;
             height: 16px;
@@ -1242,6 +1338,7 @@
             fill: none;
         }
 
+        /* Wizard Footer */
         .wizard-footer {
             display: flex;
             justify-content: flex-end;
@@ -1252,6 +1349,7 @@
             flex-shrink: 0;
             width: 100%;
         }
+
         .btn-launch {
             background: linear-gradient(135deg, #0052D4 0%, #4364F7 100%);
             border: none;
@@ -1267,13 +1365,16 @@
             gap: 10px;
             letter-spacing: 0.5px;
         }
+
         .btn-launch:hover {
             opacity: 0.9;
             transform: scale(1.01);
         }
+
         .btn-launch:active {
             transform: scale(0.97);
         }
+
         .btn-launch svg {
             width: 20px;
             height: 20px;
@@ -1281,6 +1382,7 @@
             stroke-width: 2;
             fill: none;
         }
+
         .btn-launch-secondary {
             background: transparent;
             border: 1px solid #333333;
@@ -1292,50 +1394,14 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .btn-launch-secondary:hover {
             background: #222222;
             color: #ffffff;
             border-color: #555555;
         }
 
-        /* --- WIZARD SUCCESS STATE --- */
-        .wizard-success {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            padding: 30px 20px;
-            text-align: center;
-            background: rgba(16, 185, 129, 0.05);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 16px;
-            margin-top: 10px;
-        }
-        .wizard-success.show {
-            display: flex;
-        }
-        .wizard-success .success-icon {
-            font-size: 48px;
-            color: #10B981;
-        }
-        .wizard-success .success-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #10B981;
-        }
-        .wizard-success .success-link {
-            color: #6FB1FC;
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: 14px;
-            word-break: break-all;
-        }
-        .wizard-success .success-link:hover {
-            color: #ffffff;
-        }
-
-        /* --- RESPONSIVE --- */
+        /* Responsive wizard */
         @media (max-width: 900px) {
             .wizard-body {
                 grid-template-columns: 1fr;
@@ -1349,6 +1415,7 @@
                 font-size: 22px;
             }
         }
+
         @media (max-width: 640px) {
             .dashboard-content {
                 margin-left: 80px;
@@ -1375,248 +1442,982 @@
             .wizard-body {
                 grid-template-columns: 1fr;
             }
-            .index-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        @media (max-width: 480px) {
-            .index-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- INTRO -->
+    <!-- INTRO VIEW -->
     <div class="intro-container" id="introScreen">
         <img src="https://i.postimg.cc/k4qhYNX4/Gemini-Generated-Image-v32hgqv32hgqv32h.jpg" alt="CONFLUENCE Banner" class="intro-banner">
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- DASHBOARD VIEW -->
     <div class="dashboard-container" id="dashboardScreen">
 
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-inner">
+                <!-- Branding -->
                 <div class="sidebar-header">
                     <img src="https://i.postimg.cc/qRWCQrTx/Screenshot-2026-08-27-092413-removebg-preview.png" alt="CONFLUENCE Icon" class="brand-logo">
                     <img src="https://i.postimg.cc/FKQWCth6/image-removebg-preview-(1).png" alt="CONFLUENCE Name" class="brand-title-img">
                 </div>
+
+                <!-- Divider -->
                 <div class="sidebar-divider"></div>
+
+                <!-- Navigation -->
                 <nav class="sidebar-nav">
                     <a href="#" class="nav-item active" data-tab="home">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" /></svg></span>
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
+                            </svg>
+                        </span>
                         <span class="nav-text">Home</span>
                     </a>
+
                     <a href="#" class="nav-item" data-tab="explore">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" /></svg></span>
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+                            </svg>
+                        </span>
                         <span class="nav-text">Explore</span>
                     </a>
+
                     <a href="#" class="nav-item" data-tab="leaderboard">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20L18 20" /><path d="M12 4L12 16" /><path d="M8 12L8 16" /><path d="M16 8L16 16" /></svg></span>
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 20L18 20" />
+                                <path d="M12 4L12 16" />
+                                <path d="M8 12L8 16" />
+                                <path d="M16 8L16 16" />
+                            </svg>
+                        </span>
                         <span class="nav-text">Leaderboard</span>
                     </a>
+
                     <div class="nav-spacer"></div>
+
                     <a href="#" class="nav-item" data-tab="portfolio">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg></span>
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                        </span>
                         <span class="nav-text">Portfolio</span>
                     </a>
+
                     <a href="#" class="nav-item" data-tab="settings">
-                        <span class="nav-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" /></svg></span>
+                        <span class="nav-icon">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+                            </svg>
+                        </span>
                         <span class="nav-text">Settings</span>
                     </a>
                 </nav>
             </div>
         </aside>
 
-        <!-- MAIN -->
+        <!-- MAIN CONTENT -->
         <main class="dashboard-content">
-            <!-- TOP BAR -->
+            <!-- Top Bar Section -->
             <div class="top-bar">
+                <!-- Search Bar -->
                 <div class="search-bar">
-                    <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg></span>
+                    <span class="search-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </span>
                     <input type="text" placeholder="Search for tokens, wallets..." />
                     <span class="shortcut-hint">⌘K</span>
                 </div>
+
+                <!-- Header Actions (Top Right) -->
                 <div class="header-actions">
+                    <!-- Wallet Connect Button -->
                     <button class="btn-action" id="connectWalletBtn">
-                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" /><path d="M4 6v12c0 1.1.9 2 2 2h14v-4" /><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" /></svg>
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                            <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                            <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
+                        </svg>
                         <span id="connectWalletBtnText">Connect Wallet</span>
                     </button>
+
+                    <!-- Wallet Balance Badge (shows SOL balance, not portfolio value) -->
                     <div class="wallet-balance-badge" id="walletBalanceBadge">
-                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" /><line x1="12" y1="8" x2="12" y2="16" /><path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2.5-2.5 2.5s-2.5 1-2.5 2.5a2.5 2.5 0 0 0 5 0" /></svg>
-                        <span id="badgeBalanceText">0.00 SOL</span>
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="8" />
+                            <line x1="12" y1="8" x2="12" y2="16" />
+                            <path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2.5-2.5 2.5s-2.5 1-2.5 2.5a2.5 2.5 0 0 0 5 0" />
+                        </svg>
+                        <span id="badgeBalanceText">$0</span>
                     </div>
+
+                    <!-- Create Button -->
                     <button class="btn-action" id="createBtn">
-                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
                         <span>Create</span>
                     </button>
+
+                    <!-- Profile Icon Template -->
                     <button class="profile-btn" id="profileBtn" aria-label="Profile">
-                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+
+                        <!-- Profile Popover -->
                         <div class="profile-popover" id="profilePopover">
                             <div class="popover-header" id="popoverWalletAddress">Not Connected</div>
-                            <div class="popover-balance-row"><span>SOL Balance:</span><span id="popoverSolBalance">0.00 SOL</span></div>
-                            <div class="popover-balance-row"><span>USDC Balance:</span><span id="popoverUsdcBalance">0.00 USDC</span></div>
+                            <div class="popover-balance-row">
+                                <span>SOL Balance:</span>
+                                <span id="popoverSolBalance">0.00 SOL</span>
+                            </div>
+                            <div class="popover-balance-row">
+                                <span>USDC Balance:</span>
+                                <span id="popoverUsdcBalance">0.00 USDC</span>
+                            </div>
                         </div>
                     </button>
                 </div>
             </div>
 
-            <!-- TABS -->
+            <!-- Board, Portfolio, and Inbox Tabs -->
             <div class="dashboard-tabs" id="mainTabs">
-                <button class="tab-btn active" id="btnBoard" data-tab="board">Board</button>
-                <button class="tab-btn" id="btnPortfolio" data-tab="portfolio">Portfolio</button>
-                <button class="tab-btn" id="btnInbox" data-tab="inbox">Inbox</button>
+                <button class="tab-btn active" id="btnBoard" onclick="switchMainTab('board')">Board</button>
+                <button class="tab-btn" id="btnPortfolio" onclick="switchMainTab('portfolio')">Portfolio</button>
+                <button class="tab-btn" id="btnInbox" onclick="switchMainTab('inbox')">Inbox</button>
             </div>
 
-            <!-- WORKSPACE -->
+            <!-- Main Content Area -->
             <div class="workspace-content" id="workspaceContent">
-                <div id="tabLoader" class="tab-loader"><div class="spinner"></div></div>
+                <!-- Fake Loading Screen overlay -->
+                <div id="tabLoader" class="tab-loader">
+                    <div class="spinner"></div>
+                </div>
 
-                <!-- VIEW: BOARD -->
+                <!-- Tab Views -->
                 <div id="viewBoard" class="tab-view active-view">
                     <div class="subsection-header">Speculative Blue-Chips</div>
+
+                    <!-- Horizontally Scrollable Cards Container -->
                     <div class="cards-row-container" id="cardsRow">
-                        <div class="card"><div class="card-frame"></div><div class="card-details"><div class="card-meta-top"><span class="card-ticker">$SPEC</span><span class="card-mc">$0 MC</span></div><div class="card-creator"><span class="creator-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>creator_01</span></div><p class="card-description">Sample asset overview details and metrics ending with.... <button class="btn-read-more">more</button></p></div></div>
-                        <div class="card"><div class="card-frame"></div><div class="card-details"><div class="card-meta-top"><span class="card-ticker">$BLUE</span><span class="card-mc">$0 MC</span></div><div class="card-creator"><span class="creator-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>creator_02</span></div><p class="card-description">Early stage decentralized protocol parameters.... <button class="btn-read-more">more</button></p></div></div>
-                        <div class="card"><div class="card-frame"></div><div class="card-details"><div class="card-meta-top"><span class="card-ticker">$ALPHA</span><span class="card-mc">$0 MC</span></div><div class="card-creator"><span class="creator-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>creator_03</span></div><p class="card-description">Community backed liquidity pool metadata.... <button class="btn-read-more">more</button></p></div></div>
-                        <div class="card"><div class="card-frame"></div><div class="card-details"><div class="card-meta-top"><span class="card-ticker">$CHIP</span><span class="card-mc">$0 MC</span></div><div class="card-creator"><span class="creator-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>creator_04</span></div><p class="card-description">Experimental automated trading curve strategy.... <button class="btn-read-more">more</button></p></div></div>
-                        <div class="card"><div class="card-frame"></div><div class="card-details"><div class="card-meta-top"><span class="card-ticker">$NEXUS</span><span class="card-mc">$0 MC</span></div><div class="card-creator"><span class="creator-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>creator_05</span></div><p class="card-description">Cross-chain smart contract integration update.... <button class="btn-read-more">more</button></p></div></div>
+                        <!-- Card 1 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$SPEC</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_01</span>
+                                </div>
+                                <p class="card-description">
+                                    Sample asset overview details and metrics ending with....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$BLUE</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_02</span>
+                                </div>
+                                <p class="card-description">
+                                    Early stage decentralized protocol parameters....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$ALPHA</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_03</span>
+                                </div>
+                                <p class="card-description">
+                                    Community backed liquidity pool metadata....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 4 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$CHIP</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_04</span>
+                                </div>
+                                <p class="card-description">
+                                    Experimental automated trading curve strategy....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Card 5 -->
+                        <div class="card">
+                            <div class="card-frame"></div>
+                            <div class="card-details">
+                                <div class="card-meta-top">
+                                    <span class="card-ticker">$NEXUS</span>
+                                    <span class="card-mc">$0 MC</span>
+                                </div>
+                                <div class="card-creator">
+                                    <span class="creator-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span>creator_05</span>
+                                </div>
+                                <p class="card-description">
+                                    Cross-chain smart contract integration update....
+                                    <button class="btn-read-more">more</button>
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- ===== INDEX REGULARS SECTION ===== -->
                     <div class="index-regulars-wrapper">
                         <div class="index-regulars-inner">
                             <div class="subsection-header">Index Regulars</div>
-                            <div class="index-grid" id="indexGrid">
-                                <!-- 15 items: static data from original, kept as-is -->
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">AIM HIGH</div><div class="index-ticker">$HIGH</div><div class="index-mc-row"><span class="index-mc-badge">$10.7K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">tanlobster</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>1m</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">VORTEX NETWORK</div><div class="index-ticker">$VORTEX</div><div class="index-mc-row"><span class="index-mc-badge">$450K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">creator_02</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>5h</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">HELIOS CHAIN</div><div class="index-ticker">$HELIOS</div><div class="index-mc-row"><span class="index-mc-badge">$890K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">creator_03</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>1d</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">QUANTUM AI</div><div class="index-ticker">$QAI</div><div class="index-mc-row"><span class="index-mc-badge">$310K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">creator_04</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>3d</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">SOLANA ECO</div><div class="index-ticker">$SOLECO</div><div class="index-mc-row"><span class="index-mc-badge">$2.4M</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">creator_05</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>4d</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">NEON PULSE</div><div class="index-ticker">$PULSE</div><div class="index-mc-row"><span class="index-mc-badge">$75.2K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">neonrider</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>12h</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">APEX PROTOCOL</div><div class="index-ticker">$APEX</div><div class="index-mc-row"><span class="index-mc-badge">$1.2M</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">apexuser</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>2d</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">CYBER PUNK</div><div class="index-ticker">$CYBER</div><div class="index-mc-row"><span class="index-mc-badge">$95.4K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">glitch</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>6h</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">STRATOSPHERE</div><div class="index-ticker">$STRAT</div><div class="index-mc-row"><span class="index-mc-badge">$520K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">skywalker</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>5d</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">NEXUS PRIME</div><div class="index-ticker">$PRIME</div><div class="index-mc-row"><span class="index-mc-badge">$330K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">matrix</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>3h</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">TITAN YIELD</div><div class="index-ticker">$TITAN</div><div class="index-mc-row"><span class="index-mc-badge">$680K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">colossus</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>4d</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">ECHO VALLEY</div><div class="index-ticker">$ECHO</div><div class="index-mc-row"><span class="index-mc-badge">$42.1K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">sonorous</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>30m</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">NEXUS LABS</div><div class="index-ticker">$LABS</div><div class="index-mc-row"><span class="index-mc-badge">$1.5M</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">scientist</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>7d</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">SOLARIS TOKEN</div><div class="index-ticker">$SOLAR</div><div class="index-mc-row"><span class="index-mc-badge">$190K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">helios_dev</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>18h</span></div><div class="index-meta-footer">-</div></div></div>
-                                <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">INFINITY POOL</div><div class="index-ticker">$POOL</div><div class="index-mc-row"><span class="index-mc-badge">$910K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">infinity</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>6d</span></div><div class="index-meta-footer">-</div></div></div>
+
+                            <!-- 15 Items Total (3 Rows of 5) -->
+                            <div class="index-grid">
+                                <!-- Row 1 (Items 1-5) -->
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">AIM HIGH</div>
+                                        <div class="index-ticker">$HIGH</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$10.7K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">tanlobster</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                1m
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">VORTEX NETWORK</div>
+                                        <div class="index-ticker">$VORTEX</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$450K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">creator_02</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                5h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">HELIOS CHAIN</div>
+                                        <div class="index-ticker">$HELIOS</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$890K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">creator_03</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                1d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">QUANTUM AI</div>
+                                        <div class="index-ticker">$QAI</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$310K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">creator_04</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                3d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">SOLANA ECO</div>
+                                        <div class="index-ticker">$SOLECO</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$2.4M</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">creator_05</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                4d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <!-- Row 2 (Items 6-10) -->
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">NEON PULSE</div>
+                                        <div class="index-ticker">$PULSE</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$75.2K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">neonrider</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                12h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">APEX PROTOCOL</div>
+                                        <div class="index-ticker">$APEX</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$1.2M</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">apexuser</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                2d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">CYBER PUNK</div>
+                                        <div class="index-ticker">$CYBER</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$95.4K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">glitch</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                6h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">STRATOSPHERE</div>
+                                        <div class="index-ticker">$STRAT</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$520K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">skywalker</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                5d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">NEXUS PRIME</div>
+                                        <div class="index-ticker">$PRIME</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$330K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">matrix</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                3h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <!-- Row 3 (Items 11-15) -->
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">TITAN YIELD</div>
+                                        <div class="index-ticker">$TITAN</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$680K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">colossus</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                4d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">ECHO VALLEY</div>
+                                        <div class="index-ticker">$ECHO</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$42.1K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">sonorous</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                30m
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">NEXUS LABS</div>
+                                        <div class="index-ticker">$LABS</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$1.5M</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">scientist</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                7d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">SOLARIS TOKEN</div>
+                                        <div class="index-ticker">$SOLAR</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$190K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">helios_dev</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                18h
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="index-card">
+                                    <div class="index-card-frame"></div>
+                                    <div class="index-card-meta">
+                                        <div class="index-token-name">INFINITY POOL</div>
+                                        <div class="index-ticker">$POOL</div>
+                                        <div class="index-mc-row">
+                                            <span class="index-mc-badge">$910K</span>
+                                            <span class="index-mc-label">MC</span>
+                                        </div>
+                                        <div class="index-creator-row">
+                                            <span class="index-creator-avatar">
+                                                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                            </span>
+                                            <span class="index-creator-name">infinity</span>
+                                            <span class="index-age-wrap">
+                                                <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 22v-9"/>
+                                                    <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                                    <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                                </svg>
+                                                6d
+                                            </span>
+                                        </div>
+                                        <div class="index-meta-footer">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ===== END INDEX REGULARS ===== -->
+
+                </div>
+
+                <!-- PORTFOLIO VIEW IMPLEMENTATION -->
+                <div id="viewPortfolio" class="tab-view">
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: #121212; border: 1px solid #222222; border-radius: 16px; padding: 24px;">
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <span style="font-size: 14px; color: #888888; font-weight: 600;">Total Portfolio Value</span>
+                            <!-- Portfolio value now uses a normal super bold font and always shows $0 -->
+                            <span class="portfolio-value" id="portfolioTotalVal">$0</span>
+                        </div>
+                        <button class="btn-action portfolioConnectBtn" style="background: linear-gradient(135deg, #0052D4 0%, #4364F7 100%); border: none; padding: 12px 24px; font-weight: 600; cursor: pointer;">
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
+                                <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                                <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                                <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
+                            </svg>
+                            <span>Connect Wallet</span>
+                        </button>
+                    </div>
+
+                    <div class="subsection-header">Owned Assets</div>
+
+                    <!-- Exact Index Cards Grid representing Owned Assets -->
+                    <div class="index-grid" style="padding-bottom: 24px;">
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">AIM HIGH</div>
+                                <div class="index-ticker">$HIGH</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$10.7K</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">tanlobster</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        1m
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
+                            </div>
+                        </div>
+
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">VORTEX NETWORK</div>
+                                <div class="index-ticker">$VORTEX</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$450K</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">creator_02</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        5h
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
+                            </div>
+                        </div>
+
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">HELIOS CHAIN</div>
+                                <div class="index-ticker">$HELIOS</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$890K</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">creator_03</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        1d
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
+                            </div>
+                        </div>
+
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">QUANTUM AI</div>
+                                <div class="index-ticker">$QAI</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$310K</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">creator_04</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        3d
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
+                            </div>
+                        </div>
+
+                        <div class="index-card">
+                            <div class="index-card-frame"></div>
+                            <div class="index-card-meta">
+                                <div class="index-token-name">SOLANA ECO</div>
+                                <div class="index-ticker">$SOLECO</div>
+                                <div class="index-mc-row">
+                                    <span class="index-mc-badge">$2.4M</span>
+                                    <span class="index-mc-label">MC</span>
+                                </div>
+                                <div class="index-creator-row">
+                                    <span class="index-creator-avatar">
+                                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                    <span class="index-creator-name">creator_05</span>
+                                    <span class="index-age-wrap">
+                                        <svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22v-9"/>
+                                            <path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/>
+                                            <path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/>
+                                        </svg>
+                                        4d
+                                    </span>
+                                </div>
+                                <div class="index-meta-footer">-</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- VIEW: PORTFOLIO -->
-                <div id="viewPortfolio" class="tab-view">
-                    <div style="width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;background:#121212;border:1px solid #222222;border-radius:16px;padding:24px;">
-                        <div style="display:flex;flex-direction:column;gap:8px;">
-                            <span style="font-size:14px;color:#888888;font-weight:600;">Total Portfolio Value</span>
-                            <span class="portfolio-value" id="portfolioTotalVal">0.00 SOL</span>
-                        </div>
-                        <button class="btn-action portfolioConnectBtn" style="background:linear-gradient(135deg,#0052D4 0%,#4364F7 100%);border:none;padding:12px 24px;font-weight:600;cursor:pointer;">
-                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" /><path d="M4 6v12c0 1.1.9 2 2 2h14v-4" /><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" /></svg>
-                            <span>Connect Wallet</span>
-                        </button>
-                    </div>
-                    <div class="subsection-header">Owned Assets</div>
-                    <div class="index-grid" style="padding-bottom:24px;">
-                        <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">AIM HIGH</div><div class="index-ticker">$HIGH</div><div class="index-mc-row"><span class="index-mc-badge">$10.7K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">tanlobster</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>1m</span></div><div class="index-meta-footer">-</div></div></div>
-                        <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">VORTEX NETWORK</div><div class="index-ticker">$VORTEX</div><div class="index-mc-row"><span class="index-mc-badge">$450K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">creator_02</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>5h</span></div><div class="index-meta-footer">-</div></div></div>
-                        <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">HELIOS CHAIN</div><div class="index-ticker">$HELIOS</div><div class="index-mc-row"><span class="index-mc-badge">$890K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">creator_03</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>1d</span></div><div class="index-meta-footer">-</div></div></div>
-                        <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">QUANTUM AI</div><div class="index-ticker">$QAI</div><div class="index-mc-row"><span class="index-mc-badge">$310K</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">creator_04</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>3d</span></div><div class="index-meta-footer">-</div></div></div>
-                        <div class="index-card"><div class="index-card-frame"></div><div class="index-card-meta"><div class="index-token-name">SOLANA ECO</div><div class="index-ticker">$SOLECO</div><div class="index-mc-row"><span class="index-mc-badge">$2.4M</span><span class="index-mc-label">MC</span></div><div class="index-creator-row"><span class="index-creator-avatar"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="index-creator-name">creator_05</span><span class="index-age-wrap"><svg class="seed-icon-svg" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-9"/><path d="M12 13C12 7.5 7.5 7.5 4 8c.5 5 4.5 5 8 5z"/><path d="M12 13C12 7.5 16.5 7.5 20 8c-.5 5-4.5 5-8 5z"/></svg>4d</span></div><div class="index-meta-footer">-</div></div></div>
-                    </div>
-                </div>
-
-                <!-- VIEW: INBOX -->
                 <div id="viewInbox" class="tab-view">
-                    <span style="color:#888;font-size:18px;">📬 Inbox feature is under development</span>
+                    <span>📬 Inbox feature is under development</span>
                 </div>
 
-                <!-- VIEW: TOKEN WIZARD -->
+                <!-- ===== TOKEN CREATION WIZARD (FULLSCREEN WORKSPACE) ===== -->
                 <div class="token-wizard-view" id="viewTokenWizard">
+                    <!-- Header -->
                     <div class="wizard-header">
                         <button class="wizard-back-btn" id="wizardBackBtn">
-                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 18 9 12 15 6" />
+                            </svg>
                             Back
                         </button>
                         <h1>Launch New Token</h1>
                     </div>
+
+                    <!-- Wizard Body -->
                     <div class="wizard-body">
+                        <!-- Left Column -->
                         <div class="wizard-left">
+                            <!-- Token Name -->
                             <div class="form-group">
                                 <label for="tokenName">Token Name</label>
                                 <input type="text" id="tokenName" class="form-input" placeholder="e.g. Confluence Coin" maxlength="32" />
                             </div>
+
+                            <!-- Ticker / Symbol -->
                             <div class="form-group">
                                 <label for="tokenTicker">Ticker (Symbol)</label>
-                                <input type="text" id="tokenTicker" class="form-input" placeholder="e.g. CONF" maxlength="8" style="text-transform:uppercase;" />
+                                <input type="text" id="tokenTicker" class="form-input" placeholder="e.g. CONF" maxlength="8" style="text-transform: uppercase;" />
                             </div>
+
+                            <!-- Description -->
                             <div class="form-group">
                                 <label for="tokenDescription">Description</label>
                                 <textarea id="tokenDescription" class="form-input textarea-input" placeholder="Describe your token's vision, utility, and community value…" rows="4"></textarea>
                             </div>
                         </div>
+
+                        <!-- Right Column -->
                         <div class="wizard-right">
+                            <!-- Image Upload -->
                             <div class="form-group">
                                 <label>Token Image</label>
                                 <div class="image-upload-area" id="imageUploadArea">
-                                    <input type="file" id="imageInput" accept="image/*" style="display:none;" />
-                                    <div class="upload-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg></div>
+                                    <!-- Hidden file input -->
+                                    <input type="file" id="imageInput" accept="image/*" style="display: none;" />
+                                    <!-- Upload icon -->
+                                    <div class="upload-icon">
+                                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                            <circle cx="8.5" cy="8.5" r="1.5" />
+                                            <polyline points="21 15 16 10 5 21" />
+                                        </svg>
+                                    </div>
                                     <div class="upload-text">Click to upload or drag &amp; drop</div>
                                     <div class="upload-sub">PNG, JPG, GIF up to 2MB</div>
+                                    <!-- Preview image -->
                                     <img class="image-preview" id="imagePreview" alt="Token image preview" />
+                                    <!-- Remove button -->
                                     <button class="remove-image-btn" id="removeImageBtn" type="button">
-                                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
-                            <div style="background:#0d0d0d;border:1px solid #222222;border-radius:14px;padding:16px;flex:1;min-height:80px;display:flex;flex-direction:column;gap:6px;justify-content:center;">
-                                <span style="font-size:12px;color:#666666;text-transform:uppercase;letter-spacing:0.5px;">Token Preview</span>
-                                <div style="display:flex;align-items:center;gap:12px;">
-                                    <div id="previewImage" style="width:48px;height:48px;border-radius:12px;background:#1a1a1a;border:1px solid #2a2a2a;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#444444;font-size:12px;overflow:hidden;">
-                                        <svg viewBox="0 0 24 24" style="width:24px;height:24px;stroke:#444444;stroke-width:1.5;fill:none;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+
+                            <!-- Summary / Preview (optional) -->
+                            <div style="background: #0d0d0d; border: 1px solid #222222; border-radius: 14px; padding: 16px; flex: 1; min-height: 80px; display: flex; flex-direction: column; gap: 6px; justify-content: center;">
+                                <span style="font-size: 12px; color: #666666; text-transform: uppercase; letter-spacing: 0.5px;">Token Preview</span>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <div id="previewImage" style="width: 48px; height: 48px; border-radius: 12px; background: #1a1a1a; border: 1px solid #2a2a2a; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #444444; font-size: 12px; overflow: hidden;">
+                                        <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; stroke: #444444; stroke-width: 1.5; fill: none;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
                                     </div>
-                                    <div><div id="previewName" style="font-size:16px;font-weight:700;color:#ffffff;">Token Name</div><div id="previewTicker" style="font-size:13px;color:#6e7681;">$TICKER</div></div>
+                                    <div>
+                                        <div id="previewName" style="font-size: 16px; font-weight: 700; color: #ffffff;">Token Name</div>
+                                        <div id="previewTicker" style="font-size: 13px; color: #6e7681;">$TICKER</div>
+                                    </div>
                                 </div>
-                                <div id="previewDesc" style="font-size:13px;color:#888888;margin-top:4px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Your token description will appear here</div>
-                            </div>
-                            <!-- Success state (hidden by default) -->
-                            <div class="wizard-success" id="wizardSuccess">
-                                <div class="success-icon">✅</div>
-                                <div class="success-title">Token Metadata Uploaded!</div>
-                                <div style="font-size:13px;color:#aaa;">Metadata URI:</div>
-                                <a class="success-link" id="successMetadataLink" href="#" target="_blank">https://gateway.irys.xyz/...</a>
-                                <div style="font-size:12px;color:#666;margin-top:4px;">Your token is now permanently stored on Irys.</div>
+                                <div id="previewDesc" style="font-size: 13px; color: #888888; margin-top: 4px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Your token description will appear here</div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Footer Actions -->
                     <div class="wizard-footer">
                         <button class="btn-launch-secondary" id="wizardCancelBtn">Cancel</button>
                         <button class="btn-launch" id="wizardLaunchBtn">
-                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4z" /></svg>
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 2L11 13" />
+                                <path d="M22 2L15 22l-4-9-9-4z" />
+                            </svg>
                             Launch Token
                         </button>
                     </div>
                 </div>
+                <!-- ===== END TOKEN CREATION WIZARD ===== -->
 
-            </div><!-- /workspace-content -->
+            </div>
         </main>
-    </div><!-- /dashboard-container -->
+    </div>
 
-    <!-- WALLET MODAL -->
+    <!-- WALLET CONNECT MODAL OVERLAY -->
     <div class="wallet-modal-overlay" id="walletModalOverlay">
         <div class="wallet-modal-frame" id="walletModalFrame">
-            <div id="walletStep1" style="display:flex;flex-direction:column;height:100%;justify-content:space-between;">
+            <!-- Step 1: Explanation & Security Notice -->
+            <div id="walletStep1" style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
                 <div>
                     <div class="wallet-modal-title">Secure Wallet Connection</div>
-                    <div class="wallet-modal-body" style="margin-top:10px;">
+                    <div class="wallet-modal-body" style="margin-top: 10px;">
                         <p><strong>How Wallet Connect Works:</strong> Confluence securely bridges with your browser extension via decentralized cryptographic protocols to authenticate your identity and display your Solana-based portfolio assets.</p>
-                        <div class="wallet-disclaimer">🔒 <strong>Privacy & Liability:</strong> We never store, request, or access your mnemonics, private keys, or personal account data. Confluence is fully non-custodial and is not liable for any lost funds or unauthorized external transactions related to your wallet account.</div>
+                        <div class="wallet-disclaimer">
+                            🔒 <strong>Privacy & Liability:</strong> We never store, request, or access your mnemonics, private keys, or personal account data. Confluence is fully non-custodial and is not liable for any lost funds or unauthorized external transactions related to your wallet account.
+                        </div>
                     </div>
                 </div>
                 <div class="wallet-modal-footer">
@@ -1624,20 +2425,55 @@
                     <button class="btn-modal-primary" id="understoodWalletBtn">Understood</button>
                 </div>
             </div>
+
+            <!-- Step 2: Scanner / Loading state -->
             <div class="wallet-scanner-content" id="walletStep2">
                 <div class="wallet-modal-title">Scanning Extensions</div>
                 <div class="scanner-loader-wrap">
-                    <div class="spinner" style="width:42px;height:42px;"></div>
-                    <span style="font-size:14px;color:#a0a0a0;font-weight:500;" id="scannerMessage">Scanning browser extensions for active Solana wallets...</span>
+                    <div class="spinner" style="width: 42px; height: 42px;"></div>
+                    <span style="font-size: 14px; color: #a0a0a0; font-weight: 500;">Scanning browser extensions for active Solana wallets...</span>
                 </div>
                 <div class="wallet-modal-footer">
                     <button class="btn-modal-cancel" onclick="closeWalletModal()">Cancel</button>
                 </div>
             </div>
+
+            <!-- Step 3: Solana Wallet Selector Module -->
             <div class="wallet-list-content" id="walletStep3">
                 <div class="wallet-modal-title">Select Solana Web3 Wallet</div>
-                <div class="wallet-options-list" id="walletOptionsList">
-                    <!-- populated dynamically -->
+                <div class="wallet-options-list">
+                    <div class="wallet-option-item" onclick="selectSolanaWallet('Phantom', '5.42 SOL', '1420.50 USDC')">
+                        <div class="wallet-option-info">
+                            <div class="wallet-option-icon" style="background: #ab9ff2; color: #141414;">P</div>
+                            <div>
+                                <div class="wallet-option-name">Phantom</div>
+                                <div style="font-size: 11px; color: #777;">Solana browser extension</div>
+                            </div>
+                        </div>
+                        <span class="wallet-detected-badge">Detected</span>
+                    </div>
+
+                    <div class="wallet-option-item" onclick="selectSolanaWallet('Solflare', '1.85 SOL', '430.00 USDC')">
+                        <div class="wallet-option-info">
+                            <div class="wallet-option-icon" style="background: #fc7233; color: #fff;">S</div>
+                            <div>
+                                <div class="wallet-option-name">Solflare</div>
+                                <div style="font-size: 11px; color: #777;">Solana browser extension</div>
+                            </div>
+                        </div>
+                        <span class="wallet-detected-badge">Detected</span>
+                    </div>
+
+                    <div class="wallet-option-item" onclick="selectSolanaWallet('Backpack', '0.50 SOL', '85.20 USDC')">
+                        <div class="wallet-option-info">
+                            <div class="wallet-option-icon" style="background: #00d2ff; color: #141414;">B</div>
+                            <div>
+                                <div class="wallet-option-name">Backpack</div>
+                                <div style="font-size: 11px; color: #777;">Solana browser extension</div>
+                            </div>
+                        </div>
+                        <span class="wallet-detected-badge">Detected</span>
+                    </div>
                 </div>
                 <div class="wallet-modal-footer">
                     <button class="btn-modal-cancel" onclick="closeWalletModal()">Cancel</button>
@@ -1646,479 +2482,64 @@
         </div>
     </div>
 
-    <!-- TOAST CONTAINER -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- ============ SCRIPTS ============ -->
-    <script type="importmap">
-        {
-            "imports": {
-                "@solana/web3.js": "https://esm.sh/@solana/web3.js@1.98.4"
-            }
-        }
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/@irys/sdk@2.0.0/build/bundle.min.js">
-    </script>
-
     <script type="module">
-        // --- IMPORTS ---
-        import * as solanaWeb3 from '@solana/web3.js';
+        // Solana Web3 SDK is loaded as an ES module so this standalone HTML file
+        // can use real Devnet RPC calls without a bundler.
+        import * as solanaWeb3 from 'https://esm.sh/@solana/web3.js@1.98.4';
+        // Irys browser uploader. It uses the already-connected Solana wallet provider
+        // to authorize/sign Irys upload transactions; no private key is ever handled here.
+        import { WebUploader } from 'https://esm.sh/@irys/web-upload@0.0.15';
+        import { WebSolana } from 'https://esm.sh/@irys/web-upload-solana@0.1.8';
 
-        // --- GLOBALS ---
-        const DEVNET_RPC = solanaWeb3.clusterApiUrl('devnet');
-        const connection = new solanaWeb3.Connection(DEVNET_RPC, 'confirmed');
-        const USDC_MINT = new solanaWeb3.PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
-        const USDC_DECIMALS = 6;
-        const WALLET_CONNECTED_FLAG = 'wallet_connected_flag';
+        // Intro Screen Timer
+        setTimeout(() => {
+            const intro = document.getElementById('introScreen');
+            const dashboard = document.getElementById('dashboardScreen');
 
-        let activeProvider = null;
-        let activeWalletName = null;
-        let activePublicKey = null;
-        let balanceRefreshInFlight = false;
-        let isWizardOpen = false;
-        let currentMainTab = 'board';
-        let isSwitching = false;
-        let irysInstance = null;
+            intro.style.opacity = '0';
 
-        // --- DOM REFS ---
-        const $ = (s) => document.querySelector(s);
-        const $$ = (s) => document.querySelectorAll(s);
-
-        const connectBtn = $('#connectWalletBtn');
-        const connectBtnText = $('#connectWalletBtnText');
-        const badgeBalanceText = $('#badgeBalanceText');
-        const portfolioTotalVal = $('#portfolioTotalVal');
-        const profileBtn = $('#profileBtn');
-        const profilePopover = $('#profilePopover');
-        const popoverWalletAddress = $('#popoverWalletAddress');
-        const popoverSolBalance = $('#popoverSolBalance');
-        const popoverUsdcBalance = $('#popoverUsdcBalance');
-        const walletModalOverlay = $('#walletModalOverlay');
-        const dashboardScreen = $('#dashboardScreen');
-        const cancelWalletModalBtn = $('#cancelWalletModal');
-        const understoodWalletBtn = $('#understoodWalletBtn');
-        const walletStep1 = $('#walletStep1');
-        const walletStep2 = $('#walletStep2');
-        const walletStep3 = $('#walletStep3');
-        const walletOptionsList = $('#walletOptionsList');
-        const scannerMessage = $('#scannerMessage');
-        const portfolioConnectBtns = $$('.portfolioConnectBtn');
-        const disconnectBtn = $('#disconnectWalletBtn');
-        const toastContainer = $('#toastContainer');
-
-        // Wizard refs
-        const createBtn = $('#createBtn');
-        const wizardView = $('#viewTokenWizard');
-        const workspaceContent = $('#workspaceContent');
-        const mainTabs = $('#mainTabs');
-        const wizardBackBtn = $('#wizardBackBtn');
-        const wizardCancelBtn = $('#wizardCancelBtn');
-        const wizardLaunchBtn = $('#wizardLaunchBtn');
-        const tokenName = $('#tokenName');
-        const tokenTicker = $('#tokenTicker');
-        const tokenDescription = $('#tokenDescription');
-        const imageInput = $('#imageInput');
-        const imageUploadArea = $('#imageUploadArea');
-        const imagePreview = $('#imagePreview');
-        const removeImageBtn = $('#removeImageBtn');
-        const previewName = $('#previewName');
-        const previewTicker = $('#previewTicker');
-        const previewDesc = $('#previewDesc');
-        const previewImage = $('#previewImage');
-        const wizardSuccess = $('#wizardSuccess');
-        const successMetadataLink = $('#successMetadataLink');
-
-        // --- TOAST SYSTEM ---
-        function showToast(message, duration = 2500) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<span class="toast-check">✓</span> ${message}`;
-            toastContainer.appendChild(toast);
             setTimeout(() => {
-                toast.classList.add('out');
-                setTimeout(() => toast.remove(), 300);
-            }, duration);
-        }
+                intro.style.display = 'none';
+                dashboard.style.display = 'block';
+            }, 500);
 
-        // --- UTILITY ---
-        function shortAddress(address) {
-            if (!address) return 'Not Connected';
-            const str = address.toString();
-            return str.length > 10 ? `${str.slice(0, 4)}...${str.slice(-4)}` : str;
-        }
+        }, 3500);
 
-        function copyToClipboard(text) {
-            if (!text) return;
-            navigator.clipboard.writeText(text.toString()).then(() => {
-                showToast('Wallet address copied to clipboard!');
-            }).catch(() => {
-                // fallback
-                const ta = document.createElement('textarea');
-                ta.value = text.toString();
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                ta.remove();
-                showToast('Wallet address copied to clipboard!');
-            });
-        }
+        // --- Tab Switcher with Fake Loading Screen ---
+        let isSwitching = false;
+        let currentMainTab = 'board';
+        let isWizardOpen = false;
 
-        function getProviderCandidates() {
-            const candidates = [];
-            const phantomProvider = window.phantom?.solana || (window.solana?.isPhantom ? window.solana : null);
-            if (phantomProvider) candidates.push({ name: 'Phantom', provider: phantomProvider });
-            const solflareProvider = window.solflare || (window.solana?.isSolflare ? window.solana : null);
-            if (solflareProvider && !candidates.some(c => c.provider === solflareProvider)) {
-                candidates.push({ name: 'Solflare', provider: solflareProvider });
-            }
-            const backpackProvider = window.backpack?.solana || (window.backpack?.isBackpack ? window.backpack : null);
-            if (backpackProvider && !candidates.some(c => c.provider === backpackProvider)) {
-                candidates.push({ name: 'Backpack', provider: backpackProvider });
-            }
-            return candidates;
-        }
-
-        function getProviderByName(name) {
-            return getProviderCandidates().find(c => c.name === name)?.provider || null;
-        }
-
-        // --- WALLET BALANCE FETCH ---
-        async function fetchWalletBalances(publicKey) {
-            const [lamports, tokenAccounts] = await Promise.all([
-                connection.getBalance(publicKey, 'confirmed'),
-                connection.getParsedTokenAccountsByOwner(publicKey, { mint: USDC_MINT }, 'confirmed')
-            ]);
-            const solBalance = lamports / solanaWeb3.LAMPORTS_PER_SOL;
-            let rawUsdc = 0n;
-            for (const acc of tokenAccounts.value) {
-                const amt = acc.account.data.parsed?.info?.tokenAmount?.amount;
-                if (amt) rawUsdc += BigInt(amt);
-            }
-            const usdcBalance = Number(rawUsdc) / (10 ** USDC_DECIMALS);
-            return { solBalance, usdcBalance };
-        }
-
-        // --- UI UPDATE ---
-        function applyWalletSession({ name, publicKey, solBalance, usdcBalance }) {
-            const addr = publicKey.toString();
-            const short = shortAddress(addr);
-            const sol = Number(solBalance);
-            const usdc = Number(usdcBalance);
-
-            connectBtnText.textContent = short;
-            badgeBalanceText.textContent = `${sol.toFixed(2)} SOL`;
-            portfolioTotalVal.textContent = `${sol.toFixed(2)} SOL`;
-            popoverWalletAddress.textContent = short;
-            popoverWalletAddress.title = addr;
-            popoverSolBalance.textContent = `${sol.toFixed(2)} SOL`;
-            popoverUsdcBalance.textContent = `${usdc.toFixed(2)} USDC`;
-
-            portfolioConnectBtns.forEach(btn => {
-                btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;">
-                        <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
-                        <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
-                        <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
-                    </svg>
-                    <span>${short}</span>
-                `;
-            });
-
-            syncDisconnectVisibility();
-            // Re-initialize Irys with the connected wallet
-            initIrys(publicKey);
-        }
-
-        function resetWalletUI() {
-            connectBtnText.textContent = 'Connect Wallet';
-            badgeBalanceText.textContent = '0.00 SOL';
-            portfolioTotalVal.textContent = '0.00 SOL';
-            popoverWalletAddress.textContent = 'Not Connected';
-            popoverSolBalance.textContent = '0.00 SOL';
-            popoverUsdcBalance.textContent = '0.00 USDC';
-            portfolioConnectBtns.forEach(btn => {
-                btn.innerHTML = `
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;">
-                        <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
-                        <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
-                        <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
-                    </svg>
-                    <span>Connect Wallet</span>
-                `;
-            });
-            syncDisconnectVisibility();
-            irysInstance = null;
-        }
-
-        function syncDisconnectVisibility() {
-            disconnectBtn.style.display = activePublicKey ? 'block' : 'none';
-        }
-
-        async function refreshBalances() {
-            if (!activePublicKey || balanceRefreshInFlight) return;
-            balanceRefreshInFlight = true;
-            try {
-                const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
-                applyWalletSession({
-                    name: activeWalletName || 'Wallet',
-                    publicKey: activePublicKey,
-                    solBalance,
-                    usdcBalance
-                });
-            } catch (e) {
-                console.error('Balance refresh failed:', e);
-            } finally {
-                balanceRefreshInFlight = false;
-            }
-        }
-
-        // --- IRYS INITIALIZATION ---
-        async function initIrys(publicKey) {
-            try {
-                if (!window.Irys) {
-                    console.warn('Irys SDK not loaded');
-                    return;
-                }
-                // Use the connected wallet's public key; the SDK will use window.solana for signing.
-                irysInstance = new window.Irys({
-                    network: 'devnet',
-                    token: 'solana',
-                    key: publicKey.toString(),
-                });
-                console.log('Irys initialized for devnet');
-            } catch (e) {
-                console.error('Irys init failed:', e);
-                irysInstance = null;
-            }
-        }
-
-        // --- IRYS UPLOAD ---
-        async function uploadToIrys(data, contentType) {
-            if (!irysInstance) {
-                throw new Error('Irys not initialized. Please connect your wallet.');
-            }
-            // For file uploads, data is a Blob or File.
-            // For JSON, data is a string.
-            let buffer;
-            let mimeType = contentType || 'application/json';
-            if (typeof data === 'string') {
-                buffer = new TextEncoder().encode(data);
-            } else if (data instanceof Blob || data instanceof File) {
-                buffer = await data.arrayBuffer();
-                mimeType = data.type || mimeType;
-            } else {
-                throw new Error('Unsupported data type for Irys upload');
-            }
-
-            // For Solana devnet, we need to fund the node with a tiny amount of SOL.
-            // The Irys SDK handles this automatically if the wallet has a small balance.
-            const receipt = await irysInstance.upload(buffer, {
-                tags: [{ name: 'Content-Type', value: mimeType }],
-            });
-            return receipt;
-        }
-
-        // --- WALLET CONNECT FLOW ---
-        function openWalletModal() {
-            walletStep1.style.display = 'flex';
-            walletStep2.style.display = 'none';
-            walletStep3.style.display = 'none';
-            walletModalOverlay.classList.add('show');
-            dashboardScreen.classList.add('blurred');
-        }
-
-        window.closeWalletModal = function() {
-            walletModalOverlay.classList.remove('show');
-            dashboardScreen.classList.remove('blurred');
-        };
-
-        async function scanForSolanaWallets() {
-            walletStep1.style.display = 'none';
-            walletStep2.style.display = 'flex';
-            scannerMessage.textContent = 'Scanning browser extensions for active Solana wallets...';
-
-            await new Promise(r => setTimeout(r, 300));
-
-            const detected = getProviderCandidates();
-            walletStep2.style.display = 'none';
-            walletStep3.style.display = 'flex';
-
-            walletOptionsList.innerHTML = '';
-            if (detected.length === 0) {
-                walletOptionsList.innerHTML =
-                    `<div style="color:#888;padding:20px;text-align:center;">No supported Solana wallet extension detected. Install Phantom, Solflare, or Backpack.</div>`;
-                return;
-            }
-
-            detected.forEach(({ name, provider }) => {
-                const item = document.createElement('div');
-                item.className = 'wallet-option-item';
-                const icon = name.charAt(0);
-                const bgMap = { Phantom: '#ab9ff2', Solflare: '#fc7233', Backpack: '#00d2ff' };
-                const bg = bgMap[name] || '#333';
-                const color = name === 'Phantom' ? '#141414' : '#fff';
-                item.innerHTML = `
-                    <div class="wallet-option-info">
-                        <div class="wallet-option-icon" style="background:${bg};color:${color};">${icon}</div>
-                        <div><div class="wallet-option-name">${name}</div><div style="font-size:11px;color:#777;">Solana browser extension</div></div>
-                    </div>
-                    <span class="wallet-detected-badge">Detected</span>
-                `;
-                item.addEventListener('click', () => selectSolanaWallet(name));
-                walletOptionsList.appendChild(item);
-            });
-        }
-
-        async function selectSolanaWallet(walletName) {
-            const provider = getProviderByName(walletName);
-            if (!provider) {
-                await scanForSolanaWallets();
-                return;
-            }
-            try {
-                await connectToProvider(provider, walletName);
-            } catch (e) {
-                console.error(`${walletName} connection failed:`, e);
-                scannerMessage.textContent = `${walletName} connection was cancelled or failed. Please try again.`;
-                walletStep3.style.display = 'none';
-                walletStep2.style.display = 'flex';
-            }
-        }
-        window.selectSolanaWallet = selectSolanaWallet;
-
-        async function connectToProvider(provider, walletName, options = {}) {
-            if (!provider || typeof provider.connect !== 'function') {
-                throw new Error(`${walletName} provider is not available.`);
-            }
-            const response = await provider.connect(options);
-            const pubKey = response?.publicKey || provider.publicKey;
-            if (!pubKey) throw new Error(`${walletName} did not return a public key.`);
-
-            activeProvider = provider;
-            activeWalletName = walletName;
-            activePublicKey = pubKey instanceof solanaWeb3.PublicKey ? pubKey : new solanaWeb3.PublicKey(pubKey);
-
-            bindProviderEvents(provider);
-
-            const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
-            applyWalletSession({
-                name: walletName,
-                publicKey: activePublicKey,
-                solBalance,
-                usdcBalance
-            });
-
-            localStorage.setItem(WALLET_CONNECTED_FLAG, 'true');
-            closeWalletModal();
-        }
-
-        function bindProviderEvents(provider) {
-            if (!provider || typeof provider.on !== 'function' || provider.__confluenceBound) return;
-            provider.__confluenceBound = true;
-            provider.on('disconnect', () => {
-                if (activeProvider === provider) disconnectWallet(false);
-            });
-            provider.on('accountChanged', async (pubKey) => {
-                if (activeProvider !== provider) return;
-                if (!pubKey) { await disconnectWallet(false); return; }
-                try {
-                    activePublicKey = pubKey instanceof solanaWeb3.PublicKey ? pubKey : new solanaWeb3.PublicKey(pubKey);
-                    const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
-                    applyWalletSession({
-                        name: activeWalletName || 'Wallet',
-                        publicKey: activePublicKey,
-                        solBalance,
-                        usdcBalance
-                    });
-                    localStorage.setItem(WALLET_CONNECTED_FLAG, 'true');
-                } catch (e) { console.error('Account change failed:', e); }
-            });
-        }
-
-        async function disconnectWallet(callProviderDisconnect = true) {
-            const provider = activeProvider;
-            activeProvider = null;
-            activeWalletName = null;
-            activePublicKey = null;
-            localStorage.removeItem(WALLET_CONNECTED_FLAG);
-            resetWalletUI();
-            profilePopover.classList.remove('show');
-            closeWalletModal();
-            if (callProviderDisconnect && provider && typeof provider.disconnect === 'function') {
-                try { await provider.disconnect(); } catch (e) { /* ignore */ }
-            }
-            irysInstance = null;
-        }
-
-        // --- DISCONNECT BUTTON ---
-        disconnectBtn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            await disconnectWallet(true);
-        });
-
-        // --- PROFILE POPOVER ---
-        profileBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profilePopover.classList.toggle('show');
-        });
-        profilePopover.addEventListener('click', (e) => e.stopPropagation());
-        document.addEventListener('click', () => profilePopover.classList.remove('show'));
-
-        // --- WALLET CONNECT BTN ---
-        connectBtn.addEventListener('click', () => {
-            if (activePublicKey) {
-                // Copy address
-                copyToClipboard(activePublicKey.toString());
-                return;
-            }
-            openWalletModal();
-        });
-
-        // Click on popover address also copies
-        popoverWalletAddress.addEventListener('click', () => {
-            if (activePublicKey) {
-                copyToClipboard(activePublicKey.toString());
-            }
-        });
-
-        // Portfolio connect buttons
-        portfolioConnectBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (activePublicKey) {
-                    copyToClipboard(activePublicKey.toString());
-                    return;
-                }
-                openWalletModal();
-            });
-        });
-
-        // Modal controls
-        cancelWalletModalBtn.addEventListener('click', closeWalletModal);
-        understoodWalletBtn.addEventListener('click', scanForSolanaWallets);
-
-        // --- TAB SWITCHING ---
         function switchMainTab(targetTab) {
             if (isSwitching) return;
-            if (isWizardOpen) closeWizard(false);
+
+            // If wizard is open, close it first
+            if (isWizardOpen) {
+                closeWizard(false);
+            }
 
             const tabs = ['board', 'portfolio', 'inbox'];
             const targetBtnId = 'btn' + targetTab.charAt(0).toUpperCase() + targetTab.slice(1);
             const targetViewId = 'view' + targetTab.charAt(0).toUpperCase() + targetTab.slice(1);
+
             const activeBtn = document.getElementById(targetBtnId);
             const activeView = document.getElementById(targetViewId);
             const loader = document.getElementById('tabLoader');
 
             if (!activeBtn || !activeView || activeBtn.classList.contains('active')) return;
+
             isSwitching = true;
+
             tabs.forEach(tab => {
                 const bId = 'btn' + tab.charAt(0).toUpperCase() + tab.slice(1);
                 const vId = 'view' + tab.charAt(0).toUpperCase() + tab.slice(1);
                 document.getElementById(bId).classList.remove('active');
                 document.getElementById(vId).classList.remove('active-view');
             });
+
             activeBtn.classList.add('active');
             loader.classList.add('show');
+
             setTimeout(() => {
                 loader.classList.remove('show');
                 activeView.classList.add('active-view');
@@ -2126,48 +2547,54 @@
                 currentMainTab = targetTab;
             }, 450);
         }
+
         window.switchMainTab = switchMainTab;
 
-        // Tab buttons
-        document.querySelectorAll('#mainTabs .tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tab = btn.dataset.tab;
-                if (tab) switchMainTab(tab);
-            });
-        });
+        // --- Token Wizard Controls ---
+        const createBtn = document.getElementById('createBtn');
+        const wizardView = document.getElementById('viewTokenWizard');
+        const workspaceContent = document.getElementById('workspaceContent');
+        const mainTabs = document.getElementById('mainTabs');
+        const wizardBackBtn = document.getElementById('wizardBackBtn');
+        const wizardCancelBtn = document.getElementById('wizardCancelBtn');
+        const wizardLaunchBtn = document.getElementById('wizardLaunchBtn');
 
-        // Sidebar nav
-        document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                const tab = item.dataset.tab;
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                item.classList.add('active');
-                if (tab === 'home') switchMainTab('board');
-                else if (tab === 'portfolio') switchMainTab('portfolio');
-                else if (tab === 'explore' || tab === 'leaderboard' || tab === 'settings') {
-                    // For demo, just switch to board
-                    switchMainTab('board');
-                    showToast(`${tab} view coming soon`);
-                }
-            });
-        });
+        // Form fields
+        const tokenName = document.getElementById('tokenName');
+        const tokenTicker = document.getElementById('tokenTicker');
+        const tokenDescription = document.getElementById('tokenDescription');
+        const imageInput = document.getElementById('imageInput');
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const removeImageBtn = document.getElementById('removeImageBtn');
 
-        // --- WIZARD CONTROLS ---
+        // Preview elements
+        const previewName = document.getElementById('previewName');
+        const previewTicker = document.getElementById('previewTicker');
+        const previewDesc = document.getElementById('previewDesc');
+        const previewImage = document.getElementById('previewImage');
+
+        // The selected File is retained so it can be uploaded to Irys at launch time.
+        let selectedTokenImageFile = null;
+        let lastLaunchPayload = null;
+
+        // Open wizard
         function openWizard() {
+            // Hide all tab views and show wizard
             document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active-view'));
             mainTabs.style.display = 'none';
             wizardView.classList.add('active-view');
             isWizardOpen = true;
-            wizardSuccess.classList.remove('show');
         }
 
+        // Close wizard and return to previous tab
         function closeWizard(switchBack = true) {
             wizardView.classList.remove('active-view');
             mainTabs.style.display = 'flex';
             isWizardOpen = false;
-            wizardSuccess.classList.remove('show');
+
             if (switchBack) {
+                // Re-activate the current main tab
                 const tabId = currentMainTab;
                 const btnId = 'btn' + tabId.charAt(0).toUpperCase() + tabId.slice(1);
                 const viewId = 'view' + tabId.charAt(0).toUpperCase() + tabId.slice(1);
@@ -2183,50 +2610,71 @@
 
         createBtn.addEventListener('click', () => {
             openWizard();
+            // Reset form
             tokenName.value = '';
             tokenTicker.value = '';
             tokenDescription.value = '';
+            selectedTokenImageFile = null;
+            imageInput.value = '';
             imagePreview.src = '';
             imagePreview.style.display = 'none';
             imageUploadArea.classList.remove('has-image');
-            wizardSuccess.classList.remove('show');
             updatePreview();
         });
 
         wizardBackBtn.addEventListener('click', () => closeWizard(true));
         wizardCancelBtn.addEventListener('click', () => closeWizard(true));
 
-        // Preview updates
+        // Live preview updates
         function updatePreview() {
             previewName.textContent = tokenName.value || 'Token Name';
             previewTicker.textContent = tokenTicker.value ? '$' + tokenTicker.value.toUpperCase() : '$TICKER';
             previewDesc.textContent = tokenDescription.value || 'Your token description will appear here';
         }
+
         tokenName.addEventListener('input', updatePreview);
         tokenTicker.addEventListener('input', updatePreview);
         tokenDescription.addEventListener('input', updatePreview);
 
-        // --- IMAGE UPLOAD ---
-        imageUploadArea.addEventListener('click', () => imageInput.click());
+        // Image upload handling
+        imageUploadArea.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        function setSelectedTokenImage(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return false;
+            }
+
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Please choose an image smaller than 2MB.');
+                return false;
+            }
+
+            selectedTokenImageFile = file;
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const dataUrl = ev.target.result;
+                imagePreview.src = dataUrl;
+                imagePreview.style.display = 'block';
+                imageUploadArea.classList.add('has-image');
+                previewImage.innerHTML =
+                    `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" alt="preview" />`;
+            };
+            reader.readAsDataURL(file);
+            return true;
+        }
 
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const dataUrl = ev.target.result;
-                    imagePreview.src = dataUrl;
-                    imagePreview.style.display = 'block';
-                    imageUploadArea.classList.add('has-image');
-                    previewImage.innerHTML =
-                        `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" alt="preview" />`;
-                };
-                reader.readAsDataURL(file);
-            }
+            if (file) setSelectedTokenImage(file);
         });
 
         removeImageBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            selectedTokenImageFile = null;
             imagePreview.src = '';
             imagePreview.style.display = 'none';
             imageUploadArea.classList.remove('has-image');
@@ -2235,16 +2683,18 @@
                 `<svg viewBox="0 0 24 24" style="width:24px;height:24px;stroke:#444444;stroke-width:1.5;fill:none;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>`;
         });
 
-        // Drag and drop
+        // Drag-and-drop support
         imageUploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             imageUploadArea.style.borderColor = '#6FB1FC';
             imageUploadArea.style.backgroundColor = '#1a1a2a';
         });
+
         imageUploadArea.addEventListener('dragleave', () => {
             imageUploadArea.style.borderColor = '#2a2a2a';
             imageUploadArea.style.backgroundColor = '#141414';
         });
+
         imageUploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             imageUploadArea.style.borderColor = '#2a2a2a';
@@ -2252,17 +2702,8 @@
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 const file = files[0];
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        const dataUrl = ev.target.result;
-                        imagePreview.src = dataUrl;
-                        imagePreview.style.display = 'block';
-                        imageUploadArea.classList.add('has-image');
-                        previewImage.innerHTML =
-                            `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" alt="preview" />`;
-                    };
-                    reader.readAsDataURL(file);
+                if (setSelectedTokenImage(file)) {
+                    // Keep the input in sync so the selected file is preserved in the form state.
                     const dt = new DataTransfer();
                     dt.items.add(file);
                     imageInput.files = dt.files;
@@ -2270,136 +2711,607 @@
             }
         });
 
-        // --- LAUNCH TOKEN (with Irys upload) ---
+        // --- Irys-backed token launch preparation ---
+        // The image is uploaded only when the user presses Launch Token. Irys uses
+        // the currently connected wallet provider to request the required signature.
+        let irysUploader = null;
+        let irysUploaderAddress = null;
+
+        async function getIrysUploader() {
+            if (!activeProvider || !activePublicKey) {
+                throw new Error('Connect a Solana wallet before launching a token.');
+            }
+
+            // Rebuild when the connected provider/account changes.
+            if (irysUploader && irysUploaderAddress === activePublicKey.toString()) {
+                return irysUploader;
+            }
+
+            irysUploader = await WebUploader(WebSolana)
+                .withProvider(activeProvider)
+                .withRpc(DEVNET_RPC)
+                .devnet();
+
+            irysUploaderAddress = activePublicKey.toString();
+            return irysUploader;
+        }
+
+        async function uploadTokenImageToIrys(file) {
+            const uploader = await getIrysUploader();
+
+            // Irys automatically handles the file content type, but explicitly tagging
+            // it makes the resulting gateway URL reliably render as an image.
+            const tags = [
+                { name: 'application-id', value: 'ConfluenceTokenLaunch' },
+                { name: 'Content-Type', value: file.type || 'application/octet-stream' }
+            ];
+
+            // Browser uploads are signed by the wallet provider passed above.
+            const receipt = await uploader.upload(file, { tags });
+
+            if (!receipt?.id) {
+                throw new Error('Irys upload completed without a transaction ID.');
+            }
+
+            return {
+                id: receipt.id,
+                url: `https://gateway.irys.xyz/${receipt.id}`,
+                signature: receipt.signature || null
+            };
+        }
+
+        function setLaunchButtonBusy(isBusy, label = 'Launch Token') {
+            wizardLaunchBtn.disabled = isBusy;
+            wizardLaunchBtn.style.opacity = isBusy ? '0.65' : '';
+            wizardLaunchBtn.style.pointerEvents = isBusy ? 'none' : '';
+            const textNode = wizardLaunchBtn.lastChild;
+            if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                textNode.textContent = ` ${label}`;
+            }
+        }
+
         wizardLaunchBtn.addEventListener('click', async () => {
+            if (!activePublicKey || !activeProvider) {
+                alert('Connect your Solana wallet first. The connected wallet will sign the Irys upload.');
+                return;
+            }
+
             const name = tokenName.value.trim() || 'Unnamed Token';
             const ticker = tokenTicker.value.trim().toUpperCase() || 'TKN';
             const desc = tokenDescription.value.trim() || 'No description provided.';
-            const hasImage = imageUploadArea.classList.contains('has-image');
 
             if (!name || !ticker) {
-                showToast('Please fill in Token Name and Ticker.');
+                alert('Please fill in at least the Token Name and Ticker.');
                 return;
             }
 
-            if (!activePublicKey) {
-                showToast('Please connect your wallet first.');
+            if (!selectedTokenImageFile) {
+                alert('Please upload a token image first.');
                 return;
             }
 
-            // Disable button
-            wizardLaunchBtn.disabled = true;
-            wizardLaunchBtn.textContent = 'Uploading...';
+            setLaunchButtonBusy(true, 'Uploading Image…');
 
             try {
-                let imageUri = '';
-                let imageDataUrl = '';
+                const uploadedImage = await uploadTokenImageToIrys(selectedTokenImageFile);
 
-                // 1. Upload image if present
-                if (hasImage && imagePreview.src) {
-                    // Fetch the image blob from the data URL
-                    const resp = await fetch(imagePreview.src);
-                    const blob = await resp.blob();
-                    const file = new File([blob], 'token-image.png', { type: blob.type || 'image/png' });
-                    const receipt = await uploadToIrys(file, file.type);
-                    imageUri = `https://gateway.irys.xyz/${receipt.id}`;
-                    imageDataUrl = imagePreview.src;
-                } else {
-                    // Use a placeholder
-                    imageUri = 'https://via.placeholder.com/400x400/1a1a1a/ffffff?text=CONFLUENCE';
-                }
-
-                // 2. Build metadata JSON
-                const metadata = {
-                    name: name,
-                    symbol: ticker,
+                // This is the exact shape that the future Solana Devnet program can consume.
+                // For now it is only prepared and displayed; no program instruction is sent yet.
+                lastLaunchPayload = {
+                    name,
+                    ticker,
                     description: desc,
-                    image: imageUri,
-                    properties: {
-                        files: [{ uri: imageUri, type: hasImage ? 'image/png' : 'image/jpeg' }],
-                        category: 'image'
-                    }
+                    imageUrl: uploadedImage.url,
+                    imageIrysId: uploadedImage.id,
+                    imageUploadSignature: uploadedImage.signature,
+                    creator: activePublicKey.toString(),
+                    network: 'solana-devnet'
                 };
 
-                // 3. Upload metadata JSON
-                const metadataJson = JSON.stringify(metadata, null, 2);
-                const metadataReceipt = await uploadToIrys(metadataJson, 'application/json');
-                const metadataUri = `https://gateway.irys.xyz/${metadataReceipt.id}`;
+                console.log('Token launch payload ready for the future Solana Devnet program:', lastLaunchPayload);
 
-                // 4. Show success
-                wizardSuccess.classList.add('show');
-                successMetadataLink.textContent = metadataUri;
-                successMetadataLink.href = metadataUri;
-
-                console.log('✅ Metadata uploaded to Irys:', metadataUri);
-                console.log('📦 Metadata JSON:', metadata);
-
-                showToast('🎉 Token metadata uploaded to Irys!');
-
-                // Refresh balances after upload (small SOL may have been spent)
-                await refreshBalances();
-
-            } catch (err) {
-                console.error('Launch failed:', err);
-                showToast('❌ Upload failed: ' + err.message);
+                alert(
+                    `Image uploaded to Irys successfully.\n\n` +
+                    `Image URL:\n${uploadedImage.url}\n\n` +
+                    `Wallet:\n${shortAddress(activePublicKey.toString())}\n\n` +
+                    `The Solana Devnet program is not connected yet, so no token deployment transaction was submitted.`
+                );
+            } catch (error) {
+                console.error('Irys token image upload failed:', error);
+                alert(`Irys upload failed: ${error?.message || 'Unknown error'}`);
             } finally {
-                wizardLaunchBtn.disabled = false;
-                wizardLaunchBtn.innerHTML = `
-                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4z" /></svg>
-                    Launch Token
-                `;
+                setLaunchButtonBusy(false, 'Launch Token');
             }
         });
 
-        // --- AUTO-CONNECT ---
-        window.addEventListener('load', async () => {
-            if (localStorage.getItem(WALLET_CONNECTED_FLAG) !== 'true') {
-                resetWalletUI();
+        // --- REAL SOLANA DEVNET WALLET CONNECTIVITY ---
+        const DEVNET_RPC = solanaWeb3.clusterApiUrl('devnet');
+        const connection = new solanaWeb3.Connection(DEVNET_RPC, 'confirmed');
+
+        // Official Circle Devnet USDC SPL token mint.
+        const USDC_MINT = new solanaWeb3.PublicKey(
+            '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
+        );
+        const USDC_DECIMALS = 6;
+        const WALLET_CONNECTED_FLAG = 'wallet_connected_flag';
+
+        const connectBtn = document.getElementById('connectWalletBtn');
+        const connectBtnText = document.getElementById('connectWalletBtnText');
+        const portfolioConnectBtns = document.querySelectorAll('.portfolioConnectBtn');
+        const walletModalOverlay = document.getElementById('walletModalOverlay');
+        const dashboardScreen = document.getElementById('dashboardScreen');
+        const cancelWalletModalBtn = document.getElementById('cancelWalletModal');
+        const understoodWalletBtn = document.getElementById('understoodWalletBtn');
+
+        const walletStep1 = document.getElementById('walletStep1');
+        const walletStep2 = document.getElementById('walletStep2');
+        const walletStep3 = document.getElementById('walletStep3');
+
+        const badgeBalanceText = document.getElementById('badgeBalanceText');
+        const portfolioTotalVal = document.getElementById('portfolioTotalVal');
+        const profileBtn = document.getElementById('profileBtn');
+        const profilePopover = document.getElementById('profilePopover');
+        const popoverWalletAddress = document.getElementById('popoverWalletAddress');
+        const popoverSolBalance = document.getElementById('popoverSolBalance');
+        const popoverUsdcBalance = document.getElementById('popoverUsdcBalance');
+
+        // The current provider is kept only in memory. No private key or seed phrase
+        // is ever requested or stored.
+        let activeProvider = null;
+        let activeWalletName = null;
+        let activePublicKey = null;
+        let balanceRefreshInFlight = false;
+
+        function shortAddress(address) {
+            if (!address) return 'Not Connected';
+            return address.length > 10 ?
+                `${address.slice(0, 4)}...${address.slice(-4)}` :
+                address;
+        }
+
+        function setScannerMessage(message) {
+            const messageEl = walletStep2.querySelector('.scanner-loader-wrap span');
+            if (messageEl) messageEl.textContent = message;
+        }
+
+        function getProviderCandidates() {
+            const candidates = [];
+
+            // Phantom exposes window.phantom.solana and, in many browsers,
+            // window.solana. Prefer the explicit namespace when available.
+            const phantomProvider = window.phantom?.solana ||
+                (window.solana?.isPhantom ? window.solana : null);
+            if (phantomProvider) {
+                candidates.push({ name: 'Phantom', provider: phantomProvider });
+            }
+
+            const solflareProvider = window.solflare ||
+                (window.solana?.isSolflare ? window.solana : null);
+            if (solflareProvider && !candidates.some(item => item.provider === solflareProvider)) {
+                candidates.push({ name: 'Solflare', provider: solflareProvider });
+            }
+
+            // Backpack commonly exposes its Solana provider under window.backpack.solana.
+            const backpackProvider = window.backpack?.solana ||
+                (window.backpack?.isBackpack ? window.backpack : null);
+            if (backpackProvider && !candidates.some(item => item.provider === backpackProvider)) {
+                candidates.push({ name: 'Backpack', provider: backpackProvider });
+            }
+
+            return candidates.filter(item => item.provider && typeof item.provider.connect === 'function');
+        }
+
+        function getProviderByName(walletName) {
+            return getProviderCandidates().find(item => item.name === walletName)?.provider || null;
+        }
+
+        function openWalletModal() {
+            walletStep1.style.display = 'flex';
+            walletStep2.style.display = 'none';
+            walletStep3.style.display = 'none';
+            walletModalOverlay.classList.add('show');
+            dashboardScreen.classList.add('blurred');
+        }
+
+        function closeWalletModal() {
+            walletModalOverlay.classList.remove('show');
+            dashboardScreen.classList.remove('blurred');
+        }
+
+        window.closeWalletModal = closeWalletModal;
+
+        function resetPortfolioButtons() {
+            portfolioConnectBtns.forEach(btn => {
+                btn.innerHTML = `
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
+                                <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                                <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                                <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
+                            </svg>
+                            <span>Connect Wallet</span>
+                        `;
+            });
+        }
+
+        function resetWalletUI() {
+            connectBtnText.textContent = 'Connect Wallet';
+            badgeBalanceText.textContent = '$0';
+            portfolioTotalVal.textContent = '$0';
+            popoverWalletAddress.textContent = 'Not Connected';
+            popoverSolBalance.textContent = '0.00 SOL';
+            popoverUsdcBalance.textContent = '0.00 USDC';
+            resetPortfolioButtons();
+            syncDisconnectVisibility();
+        }
+
+        function applyWalletSession({ name, publicKey, solBalance, usdcBalance }) {
+            const address = publicKey.toString();
+            const short = shortAddress(address);
+            const sol = Number(solBalance);
+            const usdc = Number(usdcBalance);
+
+            connectBtnText.textContent = short;
+
+            // Wallet badge shows SOL balance — this is the wallet balance, NOT portfolio value.
+            badgeBalanceText.textContent = `${sol.toFixed(2)} SOL`;
+
+            // Portfolio value remains $0 — it only counts investments & returns on memcoins.
+            portfolioTotalVal.textContent = '$0';
+
+            popoverWalletAddress.textContent = short;
+            popoverWalletAddress.title = address;
+            popoverWalletAddress.setAttribute('aria-label', `Connected: ${address}`);
+            popoverSolBalance.textContent = `${sol.toFixed(2)} SOL`;
+            popoverUsdcBalance.textContent = `${usdc.toFixed(2)} USDC`;
+
+            portfolioConnectBtns.forEach(btn => {
+                btn.innerHTML = `
+                            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2;">
+                                <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
+                                <path d="M4 6v12c0 1.1.9 2 2 2h14v-4" />
+                                <path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z" />
+                            </svg>
+                            <span>${short}</span>
+                        `;
+            });
+
+            profilePopover.dataset.walletStatus = 'connected';
+            syncDisconnectVisibility();
+        }
+
+        async function fetchWalletBalances(publicKey) {
+            const [lamports, tokenAccounts] = await Promise.all([
+                connection.getBalance(publicKey, 'confirmed'),
+                connection.getParsedTokenAccountsByOwner(
+                    publicKey, { mint: USDC_MINT },
+                    'confirmed'
+                )
+            ]);
+
+            const solBalance = lamports / solanaWeb3.LAMPORTS_PER_SOL;
+
+            let rawUsdcAmount = 0n;
+            for (const account of tokenAccounts.value) {
+                const amount = account.account.data.parsed?.info?.tokenAmount?.amount;
+                if (amount) rawUsdcAmount += BigInt(amount);
+            }
+
+            const usdcBalance = Number(rawUsdcAmount) / (10 ** USDC_DECIMALS);
+
+            return { solBalance, usdcBalance };
+        }
+
+        async function refreshWalletBalances() {
+            if (!activePublicKey || balanceRefreshInFlight) return;
+
+            balanceRefreshInFlight = true;
+            try {
+                const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
+                applyWalletSession({
+                    name: activeWalletName || 'Wallet',
+                    publicKey: activePublicKey,
+                    solBalance,
+                    usdcBalance
+                });
+            } catch (error) {
+                console.error('Failed to fetch Solana Devnet balances:', error);
+            } finally {
+                balanceRefreshInFlight = false;
+            }
+        }
+
+        function bindProviderEvents(provider) {
+            if (!provider || typeof provider.on !== 'function') return;
+
+            // Avoid stacking listeners if the same extension provider is selected again.
+            if (provider.__confluenceListenersBound) return;
+            provider.__confluenceListenersBound = true;
+
+            provider.on('disconnect', () => {
+                if (activeProvider === provider) {
+                    disconnectWallet(false);
+                }
+            });
+
+            provider.on('accountChanged', async (publicKey) => {
+                if (activeProvider !== provider) return;
+
+                if (!publicKey) {
+                    await disconnectWallet(false);
+                    return;
+                }
+
+                try {
+                    activePublicKey = publicKey instanceof solanaWeb3.PublicKey ?
+                        publicKey :
+                        new solanaWeb3.PublicKey(publicKey.toString());
+
+                    // Force Irys to bind to the newly selected wallet account.
+                    irysUploader = null;
+                    irysUploaderAddress = null;
+
+                    const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
+                    applyWalletSession({
+                        name: activeWalletName || 'Wallet',
+                        publicKey: activePublicKey,
+                        solBalance,
+                        usdcBalance
+                    });
+                    localStorage.setItem(WALLET_CONNECTED_FLAG, 'true');
+                } catch (error) {
+                    console.error('Failed to refresh changed wallet account:', error);
+                }
+            });
+        }
+
+        async function connectToProvider(provider, walletName, options = {}) {
+            if (!provider || typeof provider.connect !== 'function') {
+                throw new Error(`${walletName} provider is not available.`);
+            }
+
+            // This is the actual wallet handshake. The extension owns the approval UI.
+            const response = await provider.connect(options);
+
+            const publicKeyValue = response?.publicKey || provider.publicKey;
+            if (!publicKeyValue) {
+                throw new Error(`${walletName} did not return a public key.`);
+            }
+
+            activeProvider = provider;
+            activeWalletName = walletName;
+            irysUploader = null;
+            irysUploaderAddress = null;
+            activePublicKey = publicKeyValue instanceof solanaWeb3.PublicKey ?
+                publicKeyValue :
+                new solanaWeb3.PublicKey(publicKeyValue.toString());
+
+            bindProviderEvents(provider);
+
+            const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
+
+            applyWalletSession({
+                name: walletName,
+                publicKey: activePublicKey,
+                solBalance,
+                usdcBalance
+            });
+
+            localStorage.setItem(WALLET_CONNECTED_FLAG, 'true');
+            closeWalletModal();
+        }
+
+        // Step 1 -> real browser extension discovery.
+        async function scanForSolanaWallets() {
+            walletStep1.style.display = 'none';
+            walletStep2.style.display = 'flex';
+            setScannerMessage('Scanning browser extensions for active Solana wallets...');
+
+            // Give the browser a microtask to finish exposing injected providers,
+            // but do not use a fake timed "scan".
+            await new Promise(resolve => setTimeout(resolve, 0));
+
+            const detected = getProviderCandidates();
+
+            walletStep2.style.display = 'none';
+            walletStep3.style.display = 'flex';
+
+            const walletItems = [...walletStep3.querySelectorAll('.wallet-option-item')];
+
+            walletItems.forEach(item => {
+                const name = item.querySelector('.wallet-option-name')?.textContent?.trim();
+                const providerEntry = detected.find(candidate => candidate.name === name);
+                const badge = item.querySelector('.wallet-detected-badge');
+
+                // Remove the old fake inline handlers so only the real provider
+                // connection path runs.
+                item.removeAttribute('onclick');
+
+                if (!providerEntry) {
+                    item.style.display = 'none';
+                    return;
+                }
+
+                item.style.display = 'flex';
+                if (badge) badge.textContent = 'Detected';
+
+                // Clone the node so a repeated scan never creates duplicate listeners.
+                const freshItem = item.cloneNode(true);
+                item.replaceWith(freshItem);
+
+                freshItem.addEventListener('click', () => {
+                    selectSolanaWallet(name);
+                });
+            });
+
+            if (detected.length === 0) {
+                setScannerMessage(
+                    'No supported Solana wallet extension was detected. Install Phantom, Solflare, or Backpack, then try again.'
+                );
+                walletStep3.querySelector('.wallet-modal-title').textContent = 'No Wallet Detected';
+                walletStep3.querySelector('.wallet-options-list').style.display = 'none';
+            } else {
+                walletStep3.querySelector('.wallet-modal-title').textContent = 'Select Solana Web3 Wallet';
+                walletStep3.querySelector('.wallet-options-list').style.display = 'flex';
+            }
+        }
+
+        // Step 3 -> real provider.connect() handshake.
+        async function selectSolanaWallet(walletName) {
+            const provider = getProviderByName(walletName);
+
+            if (!provider) {
+                console.warn(`${walletName} provider is no longer available.`);
+                await scanForSolanaWallets();
                 return;
             }
+
+            try {
+                // The browser extension will show its own approval prompt here.
+                await connectToProvider(provider, walletName);
+            } catch (error) {
+                console.error(`${walletName} connection failed:`, error);
+                setScannerMessage(
+                    `${walletName} connection was cancelled or failed. Please try again.`
+                );
+                walletStep3.style.display = 'none';
+                walletStep2.style.display = 'flex';
+            }
+        }
+
+        window.selectSolanaWallet = selectSolanaWallet;
+
+        connectBtn.addEventListener('click', () => {
+            if (activePublicKey) {
+                profilePopover.classList.toggle('show');
+                return;
+            }
+            openWalletModal();
+        });
+
+        portfolioConnectBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (activePublicKey) {
+                    profilePopover.classList.toggle('show');
+                    return;
+                }
+                openWalletModal();
+            });
+        });
+
+        cancelWalletModalBtn.addEventListener('click', closeWalletModal);
+
+        // "Understood" now performs the real provider discovery step.
+        understoodWalletBtn.addEventListener('click', scanForSolanaWallets);
+
+        // --- DISCONNECT PIPELINE ---
+        async function disconnectWallet(callProviderDisconnect = true) {
+            const provider = activeProvider;
+
+            activeProvider = null;
+            activeWalletName = null;
+            activePublicKey = null;
+            irysUploader = null;
+            irysUploaderAddress = null;
+            localStorage.removeItem(WALLET_CONNECTED_FLAG);
+
+            resetWalletUI();
+            profilePopover.classList.remove('show');
+            closeWalletModal();
+
+            if (callProviderDisconnect && provider && typeof provider.disconnect === 'function') {
+                try {
+                    await provider.disconnect();
+                } catch (error) {
+                    console.warn('Wallet provider disconnect failed:', error);
+                }
+            }
+        }
+
+        // Add a disconnect button inside the profile popover.
+        const disconnectBtn = document.createElement('div');
+        disconnectBtn.id = 'disconnectWalletBtn';
+        disconnectBtn.textContent = 'Disconnect Wallet';
+        disconnectBtn.className = 'btn-modal-cancel';
+        disconnectBtn.style.width = '100%';
+        disconnectBtn.style.marginTop = '4px';
+        disconnectBtn.style.display = 'none';
+        disconnectBtn.style.textAlign = 'center';
+        disconnectBtn.style.cursor = 'pointer';
+        disconnectBtn.setAttribute('role', 'button');
+        disconnectBtn.setAttribute('tabindex', '0');
+        profilePopover.appendChild(disconnectBtn);
+
+        const handleDisconnectClick = async (event) => {
+            event.stopPropagation();
+            await disconnectWallet(true);
+        };
+
+        disconnectBtn.addEventListener('click', handleDisconnectClick);
+        disconnectBtn.addEventListener('keydown', async (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                await handleDisconnectClick(event);
+            }
+        });
+
+        function syncDisconnectVisibility() {
+            disconnectBtn.style.display = activePublicKey ? 'block' : 'none';
+        }
+
+        // Profile Popover Toggle
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profilePopover.classList.toggle('show');
+        });
+
+        profilePopover.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        document.addEventListener('click', () => {
+            profilePopover.classList.remove('show');
+        });
+
+        // Optional header/profile settings compatibility:
+        window.addEventListener('confluence:logout', () => disconnectWallet(true));
+
+        // Auto-connect persistence:
+        window.addEventListener('load', async () => {
+            if (localStorage.getItem(WALLET_CONNECTED_FLAG) !== 'true') return;
+
             const detected = getProviderCandidates();
             if (detected.length === 0) return;
-            const sorted = [...detected].sort((a, b) => {
-                const aHas = !!a.provider.publicKey;
-                const bHas = !!b.provider.publicKey;
-                return Number(bHas) - Number(aHas);
+
+            // Prefer the provider currently holding a public key, otherwise try each
+            // detected provider silently until one is trusted.
+            const providersToTry = [...detected].sort((a, b) => {
+                const aHasKey = !!a.provider.publicKey;
+                const bHasKey = !!b.provider.publicKey;
+                return Number(bHasKey) - Number(aHasKey);
             });
-            for (const { name, provider } of sorted) {
+
+            for (const { name, provider } of providersToTry) {
                 try {
+                    // Required silent trusted-session query.
                     await connectToProvider(provider, name, { onlyIfTrusted: true });
                     return;
-                } catch (e) { /* silent */ }
-            }
-            resetWalletUI();
-        });
-
-        // --- INTRO ---
-        setTimeout(() => {
-            const intro = document.getElementById('introScreen');
-            const dashboard = document.getElementById('dashboardScreen');
-            intro.style.opacity = '0';
-            setTimeout(() => {
-                intro.style.display = 'none';
-                dashboard.style.display = 'block';
-            }, 500);
-        }, 3500);
-
-        // --- KEYBOARD SHORTCUT: CMD+K focus search ---
-        document.addEventListener('keydown', (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                e.preventDefault();
-                const searchInput = document.querySelector('.search-bar input');
-                if (searchInput) searchInput.focus();
-            }
-            if (e.key === 'Escape') {
-                if (walletModalOverlay.classList.contains('show')) closeWalletModal();
-                if (profilePopover.classList.contains('show')) profilePopover.classList.remove('show');
+                } catch (error) {
+                    // A rejected onlyIfTrusted call means this provider is not
+                    // currently trusted; continue without opening any modal.
+                    console.debug(`${name} silent auto-connect unavailable.`, error);
+                }
             }
         });
 
-        console.log('🚀 CONFLUENCE dashboard ready.');
-        console.log('📡 Solana Devnet RPC:', DEVNET_RPC);
-        console.log('🔗 Irys SDK loaded:', !!window.Irys);
+        // Start in the same visual disconnected state as the original template.
+        resetWalletUI();
+
+        // Keep the displayed wallet balances current while connected instead of only
+        // fetching once at connection time. The in-flight guard prevents overlapping RPC calls.
+        const BALANCE_REFRESH_INTERVAL_MS = 10000;
+        setInterval(() => {
+            if (activePublicKey) refreshWalletBalances();
+        }, BALANCE_REFRESH_INTERVAL_MS);
     </script>
 
 </body>
