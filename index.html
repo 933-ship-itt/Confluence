@@ -2400,6 +2400,11 @@
                         </button>
                     </div>
                 </div>
+                <div id="irysResultPanel" style="display:none; margin-top:18px; padding:16px; background:#0d0d0d; border:1px solid #214d3c; border-radius:14px; width:100%; box-sizing:border-box;">
+                    <div style="font-size:12px; font-weight:700; color:#10B981; text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px;">Irys Upload Result</div>
+                    <div id="irysResultStatus" style="font-size:13px; color:#d7d7d7; margin-bottom:10px;"></div>
+                    <pre id="irysPayloadOutput" style="margin:0; white-space:pre-wrap; word-break:break-word; font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; color:#b9c7d8; background:#090909; border:1px solid #1d2924; border-radius:10px; padding:12px; max-height:260px; overflow:auto;"></pre>
+                </div>
                 <!-- ===== END TOKEN CREATION WIZARD ===== -->
 
             </div>
@@ -2493,8 +2498,8 @@
         async function loadIrysModules() {
             if (!irysModulesPromise) {
                 irysModulesPromise = Promise.all([
-                    import('https://cdn.jsdelivr.net/npm/@irys/web-upload@0.0.15/+esm'),
-                    import('https://cdn.jsdelivr.net/npm/@irys/web-upload-solana@0.1.8/+esm')
+                    import('https://esm.sh/@irys/web-upload@0.0.15?bundle'),
+                    import('https://esm.sh/@irys/web-upload-solana@0.1.8?bundle')
                 ]).then(([webUpload, solanaUpload]) => ({
                     WebUploader: webUpload.WebUploader,
                     WebSolana: solanaUpload.WebSolana
@@ -2585,6 +2590,9 @@
         const previewTicker = document.getElementById('previewTicker');
         const previewDesc = document.getElementById('previewDesc');
         const previewImage = document.getElementById('previewImage');
+        const irysResultPanel = document.getElementById('irysResultPanel');
+        const irysResultStatus = document.getElementById('irysResultStatus');
+        const irysPayloadOutput = document.getElementById('irysPayloadOutput');
 
         // The selected File is retained so it can be uploaded to Irys at launch time.
         let selectedTokenImageFile = null;
@@ -2631,6 +2639,9 @@
             imagePreview.src = '';
             imagePreview.style.display = 'none';
             imageUploadArea.classList.remove('has-image');
+            irysResultPanel.style.display = 'none';
+            irysResultStatus.textContent = '';
+            irysPayloadOutput.textContent = '';
             updatePreview();
         });
 
@@ -2744,8 +2755,11 @@
                 throw new Error('Irys browser modules loaded without the expected Solana uploader exports.');
             }
 
-            irysUploader = await WebUploader(WebSolana)
-                .withProvider(activeProvider)
+            const builder = WebUploader(WebSolana).withProvider(activeProvider);
+            if (typeof builder.withRpc !== 'function' || typeof builder.devnet !== 'function') {
+                throw new Error('The Irys browser SDK loaded, but its Devnet builder API is unavailable.');
+            }
+            irysUploader = await builder
                 .withRpc(DEVNET_RPC)
                 .devnet();
 
@@ -2827,15 +2841,20 @@
 
                 console.log('Token launch payload ready for the future Solana Devnet program:', lastLaunchPayload);
 
-                alert(
-                    `Image uploaded to Irys successfully.\n\n` +
-                    `Image URL:\n${uploadedImage.url}\n\n` +
-                    `Wallet:\n${shortAddress(activePublicKey.toString())}\n\n` +
-                    `The Solana Devnet program is not connected yet, so no token deployment transaction was submitted.`
-                );
+                irysResultPanel.style.display = 'block';
+                irysResultStatus.textContent = `Image uploaded successfully. URL: ${uploadedImage.url}. No Solana deployment transaction has been submitted yet.`;
+                irysPayloadOutput.textContent = JSON.stringify(lastLaunchPayload, null, 2);
+                irysResultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             } catch (error) {
                 console.error('Irys token image upload failed:', error);
-                alert(`Irys upload failed: ${error?.message || 'Unknown error'}`);
+                const rawMessage = error?.message || String(error) || 'Unknown error';
+                const friendlyMessage = rawMessage.includes('402') || rawMessage.toLowerCase().includes('not enough balance')
+                    ? 'Irys Devnet rejected the upload because the Irys Devnet account needs faucet funds. No Solana deployment transaction was submitted.'
+                    : `Irys upload failed: ${rawMessage}`;
+                irysResultPanel.style.display = 'block';
+                irysResultStatus.textContent = friendlyMessage;
+                irysPayloadOutput.textContent = '';
+                alert(friendlyMessage);
             } finally {
                 setLaunchButtonBusy(false, 'Launch Token');
             }
