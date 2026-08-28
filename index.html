@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CONFLUENCE App Intro & Dashboard</title>
-    <!-- Import Vipnagorgialla font -->
     <link href="https://fonts.cdnfonts.com/css/vipnagorgialla" rel="stylesheet">
     <style>
         /* --- RESET & BASE --- */
@@ -1401,6 +1400,47 @@
             border-color: #555555;
         }
 
+        /* ----- PINATA / PAYLOAD RESULT PANEL ----- */
+        .pinata-result-panel {
+            display: none;
+            margin-top: 18px;
+            padding: 16px;
+            background: #0d0d0d;
+            border: 1px solid #214d3c;
+            border-radius: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .pinata-result-panel .result-header {
+            font-size: 12px;
+            font-weight: 700;
+            color: #10B981;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 10px;
+        }
+
+        .pinata-result-panel .result-status {
+            font-size: 13px;
+            color: #d7d7d7;
+            margin-bottom: 10px;
+        }
+
+        .pinata-result-panel .result-payload {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            color: #b9c7d8;
+            background: #090909;
+            border: 1px solid #1d2924;
+            border-radius: 10px;
+            padding: 12px;
+            max-height: 300px;
+            overflow: auto;
+        }
+
         /* Responsive wizard */
         @media (max-width: 900px) {
             .wizard-body {
@@ -1458,16 +1498,11 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-inner">
-                <!-- Branding -->
                 <div class="sidebar-header">
                     <img src="https://i.postimg.cc/qRWCQrTx/Screenshot-2026-08-27-092413-removebg-preview.png" alt="CONFLUENCE Icon" class="brand-logo">
                     <img src="https://i.postimg.cc/FKQWCth6/image-removebg-preview-(1).png" alt="CONFLUENCE Name" class="brand-title-img">
                 </div>
-
-                <!-- Divider -->
                 <div class="sidebar-divider"></div>
-
-                <!-- Navigation -->
                 <nav class="sidebar-nav">
                     <a href="#" class="nav-item active" data-tab="home">
                         <span class="nav-icon">
@@ -1477,7 +1512,6 @@
                         </span>
                         <span class="nav-text">Home</span>
                     </a>
-
                     <a href="#" class="nav-item" data-tab="explore">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -1487,7 +1521,6 @@
                         </span>
                         <span class="nav-text">Explore</span>
                     </a>
-
                     <a href="#" class="nav-item" data-tab="leaderboard">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -1499,9 +1532,7 @@
                         </span>
                         <span class="nav-text">Leaderboard</span>
                     </a>
-
                     <div class="nav-spacer"></div>
-
                     <a href="#" class="nav-item" data-tab="portfolio">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -1511,7 +1542,6 @@
                         </span>
                         <span class="nav-text">Portfolio</span>
                     </a>
-
                     <a href="#" class="nav-item" data-tab="settings">
                         <span class="nav-icon">
                             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
@@ -1529,7 +1559,6 @@
         <main class="dashboard-content">
             <!-- Top Bar Section -->
             <div class="top-bar">
-                <!-- Search Bar -->
                 <div class="search-bar">
                     <span class="search-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1541,9 +1570,7 @@
                     <span class="shortcut-hint">⌘K</span>
                 </div>
 
-                <!-- Header Actions (Top Right) -->
                 <div class="header-actions">
-                    <!-- Wallet Connect Button -->
                     <button class="btn-action" id="connectWalletBtn">
                         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4" />
@@ -1553,7 +1580,6 @@
                         <span id="connectWalletBtnText">Connect Wallet</span>
                     </button>
 
-                    <!-- Wallet Balance Badge (shows SOL balance, not portfolio value) -->
                     <div class="wallet-balance-badge" id="walletBalanceBadge">
                         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="8" />
@@ -1563,7 +1589,6 @@
                         <span id="badgeBalanceText">$0</span>
                     </div>
 
-                    <!-- Create Button -->
                     <button class="btn-action" id="createBtn">
                         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="5" x2="12" y2="19" />
@@ -1572,14 +1597,12 @@
                         <span>Create</span>
                     </button>
 
-                    <!-- Profile Icon Template -->
                     <button class="profile-btn" id="profileBtn" aria-label="Profile">
                         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
 
-                        <!-- Profile Popover -->
                         <div class="profile-popover" id="profilePopover">
                             <div class="popover-header" id="popoverWalletAddress">Not Connected</div>
                             <div class="popover-balance-row">
@@ -1595,7 +1618,7 @@
                 </div>
             </div>
 
-            <!-- Board, Portfolio, and Inbox Tabs -->
+            <!-- Board, Portfolio, Inbox Tabs -->
             <div class="dashboard-tabs" id="mainTabs">
                 <button class="tab-btn active" id="btnBoard" onclick="switchMainTab('board')">Board</button>
                 <button class="tab-btn" id="btnPortfolio" onclick="switchMainTab('portfolio')">Portfolio</button>
@@ -1604,7 +1627,6 @@
 
             <!-- Main Content Area -->
             <div class="workspace-content" id="workspaceContent">
-                <!-- Fake Loading Screen overlay -->
                 <div id="tabLoader" class="tab-loader">
                     <div class="spinner"></div>
                 </div>
@@ -1612,10 +1634,7 @@
                 <!-- Tab Views -->
                 <div id="viewBoard" class="tab-view active-view">
                     <div class="subsection-header">Speculative Blue-Chips</div>
-
-                    <!-- Horizontally Scrollable Cards Container -->
                     <div class="cards-row-container" id="cardsRow">
-                        <!-- Card 1 -->
                         <div class="card">
                             <div class="card-frame"></div>
                             <div class="card-details">
@@ -1635,8 +1654,6 @@
                                 </p>
                             </div>
                         </div>
-
-                        <!-- Card 2 -->
                         <div class="card">
                             <div class="card-frame"></div>
                             <div class="card-details">
@@ -1656,8 +1673,6 @@
                                 </p>
                             </div>
                         </div>
-
-                        <!-- Card 3 -->
                         <div class="card">
                             <div class="card-frame"></div>
                             <div class="card-details">
@@ -1677,8 +1692,6 @@
                                 </p>
                             </div>
                         </div>
-
-                        <!-- Card 4 -->
                         <div class="card">
                             <div class="card-frame"></div>
                             <div class="card-details">
@@ -1698,8 +1711,6 @@
                                 </p>
                             </div>
                         </div>
-
-                        <!-- Card 5 -->
                         <div class="card">
                             <div class="card-frame"></div>
                             <div class="card-details">
@@ -1721,14 +1732,12 @@
                         </div>
                     </div>
 
-                    <!-- ===== INDEX REGULARS SECTION ===== -->
+                    <!-- INDEX REGULARS SECTION -->
                     <div class="index-regulars-wrapper">
                         <div class="index-regulars-inner">
                             <div class="subsection-header">Index Regulars</div>
-
-                            <!-- 15 Items Total (3 Rows of 5) -->
                             <div class="index-grid">
-                                <!-- Row 1 (Items 1-5) -->
+                                <!-- Row 1 -->
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1755,7 +1764,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1782,7 +1790,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1809,7 +1816,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1836,7 +1842,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1863,8 +1868,7 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
-                                <!-- Row 2 (Items 6-10) -->
+                                <!-- Row 2 -->
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1891,7 +1895,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1918,7 +1921,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1945,7 +1947,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1972,7 +1973,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -1999,8 +1999,7 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
-                                <!-- Row 3 (Items 11-15) -->
+                                <!-- Row 3 -->
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -2027,7 +2026,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -2054,7 +2052,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -2081,7 +2078,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -2108,7 +2104,6 @@
                                         <div class="index-meta-footer">-</div>
                                     </div>
                                 </div>
-
                                 <div class="index-card">
                                     <div class="index-card-frame"></div>
                                     <div class="index-card-meta">
@@ -2138,16 +2133,13 @@
                             </div>
                         </div>
                     </div>
-                    <!-- ===== END INDEX REGULARS ===== -->
-
                 </div>
 
-                <!-- PORTFOLIO VIEW IMPLEMENTATION -->
+                <!-- PORTFOLIO VIEW -->
                 <div id="viewPortfolio" class="tab-view">
                     <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; background: #121212; border: 1px solid #222222; border-radius: 16px; padding: 24px;">
                         <div style="display: flex; flex-direction: column; gap: 8px;">
                             <span style="font-size: 14px; color: #888888; font-weight: 600;">Total Portfolio Value</span>
-                            <!-- Portfolio value now uses a normal super bold font and always shows $0 -->
                             <span class="portfolio-value" id="portfolioTotalVal">$0</span>
                         </div>
                         <button class="btn-action portfolioConnectBtn" style="background: linear-gradient(135deg, #0052D4 0%, #4364F7 100%); border: none; padding: 12px 24px; font-weight: 600; cursor: pointer;">
@@ -2159,10 +2151,7 @@
                             <span>Connect Wallet</span>
                         </button>
                     </div>
-
                     <div class="subsection-header">Owned Assets</div>
-
-                    <!-- Exact Index Cards Grid representing Owned Assets -->
                     <div class="index-grid" style="padding-bottom: 24px;">
                         <div class="index-card">
                             <div class="index-card-frame"></div>
@@ -2190,7 +2179,6 @@
                                 <div class="index-meta-footer">-</div>
                             </div>
                         </div>
-
                         <div class="index-card">
                             <div class="index-card-frame"></div>
                             <div class="index-card-meta">
@@ -2217,7 +2205,6 @@
                                 <div class="index-meta-footer">-</div>
                             </div>
                         </div>
-
                         <div class="index-card">
                             <div class="index-card-frame"></div>
                             <div class="index-card-meta">
@@ -2244,7 +2231,6 @@
                                 <div class="index-meta-footer">-</div>
                             </div>
                         </div>
-
                         <div class="index-card">
                             <div class="index-card-frame"></div>
                             <div class="index-card-meta">
@@ -2271,7 +2257,6 @@
                                 <div class="index-meta-footer">-</div>
                             </div>
                         </div>
-
                         <div class="index-card">
                             <div class="index-card-frame"></div>
                             <div class="index-card-meta">
@@ -2322,19 +2307,14 @@
                     <div class="wizard-body">
                         <!-- Left Column -->
                         <div class="wizard-left">
-                            <!-- Token Name -->
                             <div class="form-group">
                                 <label for="tokenName">Token Name</label>
                                 <input type="text" id="tokenName" class="form-input" placeholder="e.g. Confluence Coin" maxlength="32" />
                             </div>
-
-                            <!-- Ticker / Symbol -->
                             <div class="form-group">
                                 <label for="tokenTicker">Ticker (Symbol)</label>
                                 <input type="text" id="tokenTicker" class="form-input" placeholder="e.g. CONF" maxlength="8" style="text-transform: uppercase;" />
                             </div>
-
-                            <!-- Description -->
                             <div class="form-group">
                                 <label for="tokenDescription">Description</label>
                                 <textarea id="tokenDescription" class="form-input textarea-input" placeholder="Describe your token's vision, utility, and community value…" rows="4"></textarea>
@@ -2343,13 +2323,10 @@
 
                         <!-- Right Column -->
                         <div class="wizard-right">
-                            <!-- Image Upload -->
                             <div class="form-group">
                                 <label>Token Image</label>
                                 <div class="image-upload-area" id="imageUploadArea">
-                                    <!-- Hidden file input -->
                                     <input type="file" id="imageInput" accept="image/*" style="display: none;" />
-                                    <!-- Upload icon -->
                                     <div class="upload-icon">
                                         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -2359,9 +2336,7 @@
                                     </div>
                                     <div class="upload-text">Click to upload or drag &amp; drop</div>
                                     <div class="upload-sub">PNG, JPG, GIF up to 2MB</div>
-                                    <!-- Preview image -->
                                     <img class="image-preview" id="imagePreview" alt="Token image preview" />
-                                    <!-- Remove button -->
                                     <button class="remove-image-btn" id="removeImageBtn" type="button">
                                         <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
                                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -2371,7 +2346,7 @@
                                 </div>
                             </div>
 
-                            <!-- Summary / Preview (optional) -->
+                            <!-- Preview -->
                             <div style="background: #0d0d0d; border: 1px solid #222222; border-radius: 14px; padding: 16px; flex: 1; min-height: 80px; display: flex; flex-direction: column; gap: 6px; justify-content: center;">
                                 <span style="font-size: 12px; color: #666666; text-transform: uppercase; letter-spacing: 0.5px;">Token Preview</span>
                                 <div style="display: flex; align-items: center; gap: 12px;">
@@ -2399,13 +2374,14 @@
                             Launch Token
                         </button>
                     </div>
+
+                    <!-- ===== PINATA + PAYLOAD RESULT PANEL ===== -->
+                    <div class="pinata-result-panel" id="pinataResultPanel">
+                        <div class="result-header">✅ Pinata Upload &amp; Solana Payload</div>
+                        <div class="result-status" id="pinataResultStatus"></div>
+                        <pre class="result-payload" id="pinataPayloadOutput"></pre>
+                    </div>
                 </div>
-                <div id="irysResultPanel" style="display:none; margin-top:18px; padding:16px; background:#0d0d0d; border:1px solid #214d3c; border-radius:14px; width:100%; box-sizing:border-box;">
-                    <div style="font-size:12px; font-weight:700; color:#10B981; text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px;">Irys Upload Result</div>
-                    <div id="irysResultStatus" style="font-size:13px; color:#d7d7d7; margin-bottom:10px;"></div>
-                    <pre id="irysPayloadOutput" style="margin:0; white-space:pre-wrap; word-break:break-word; font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; color:#b9c7d8; background:#090909; border:1px solid #1d2924; border-radius:10px; padding:12px; max-height:260px; overflow:auto;"></pre>
-                </div>
-                <!-- ===== END TOKEN CREATION WIZARD ===== -->
 
             </div>
         </main>
@@ -2414,7 +2390,6 @@
     <!-- WALLET CONNECT MODAL OVERLAY -->
     <div class="wallet-modal-overlay" id="walletModalOverlay">
         <div class="wallet-modal-frame" id="walletModalFrame">
-            <!-- Step 1: Explanation & Security Notice -->
             <div id="walletStep1" style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
                 <div>
                     <div class="wallet-modal-title">Secure Wallet Connection</div>
@@ -2431,7 +2406,6 @@
                 </div>
             </div>
 
-            <!-- Step 2: Scanner / Loading state -->
             <div class="wallet-scanner-content" id="walletStep2">
                 <div class="wallet-modal-title">Scanning Extensions</div>
                 <div class="scanner-loader-wrap">
@@ -2443,11 +2417,10 @@
                 </div>
             </div>
 
-            <!-- Step 3: Solana Wallet Selector Module -->
             <div class="wallet-list-content" id="walletStep3">
                 <div class="wallet-modal-title">Select Solana Web3 Wallet</div>
                 <div class="wallet-options-list">
-                    <div class="wallet-option-item" onclick="selectSolanaWallet('Phantom', '5.42 SOL', '1420.50 USDC')">
+                    <div class="wallet-option-item" onclick="selectSolanaWallet('Phantom')">
                         <div class="wallet-option-info">
                             <div class="wallet-option-icon" style="background: #ab9ff2; color: #141414;">P</div>
                             <div>
@@ -2457,8 +2430,7 @@
                         </div>
                         <span class="wallet-detected-badge">Detected</span>
                     </div>
-
-                    <div class="wallet-option-item" onclick="selectSolanaWallet('Solflare', '1.85 SOL', '430.00 USDC')">
+                    <div class="wallet-option-item" onclick="selectSolanaWallet('Solflare')">
                         <div class="wallet-option-info">
                             <div class="wallet-option-icon" style="background: #fc7233; color: #fff;">S</div>
                             <div>
@@ -2468,8 +2440,7 @@
                         </div>
                         <span class="wallet-detected-badge">Detected</span>
                     </div>
-
-                    <div class="wallet-option-item" onclick="selectSolanaWallet('Backpack', '0.50 SOL', '85.20 USDC')">
+                    <div class="wallet-option-item" onclick="selectSolanaWallet('Backpack')">
                         <div class="wallet-option-info">
                             <div class="wallet-option-icon" style="background: #00d2ff; color: #141414;">B</div>
                             <div>
@@ -2488,87 +2459,28 @@
     </div>
 
     <script type="module">
-        // Solana Web3 SDK is loaded as an ES module so this standalone HTML file
-        // can use real Devnet RPC calls without a bundler.
+        // ----- Solana Web3 SDK -----
         import * as solanaWeb3 from 'https://esm.sh/@solana/web3.js@1.98.4';
-        // Irys is intentionally loaded lazily. A broken/slow third-party Irys module
-        // must never prevent the dashboard and intro screen from initializing.
-        // The Solana web adapter is kept on the 0.1.7 line alongside web-upload 0.0.14
-        // to avoid the dependency/export mismatch seen with newer combinations.
-        let irysModulesPromise = null;
 
-        async function importFirstWorking(candidates, label) {
-            const errors = [];
-            for (const url of candidates) {
-                try {
-                    return await import(url);
-                } catch (error) {
-                    errors.push(`${url}: ${error?.message || error}`);
-                }
-            }
-            throw new Error(`Unable to load ${label}.
-${errors.join('\n')}`);
-        }
-
-        async function loadIrysModules() {
-            if (!irysModulesPromise) {
-                irysModulesPromise = (async () => {
-                    const webUpload = await importFirstWorking([
-                        'https://esm.sh/@irys/web-upload@0.0.14?target=es2020&bundle',
-                        'https://cdn.jsdelivr.net/npm/@irys/web-upload@0.0.14/+esm'
-                    ], 'Irys web-upload');
-
-                    const solanaUpload = await importFirstWorking([
-                        'https://esm.sh/@irys/web-upload-solana@0.1.7?target=es2020&bundle',
-                        'https://cdn.jsdelivr.net/npm/@irys/web-upload-solana@0.1.7/+esm'
-                    ], 'Irys Solana web adapter');
-
-                    if (typeof webUpload.WebUploader !== 'function') {
-                        throw new Error('Irys web-upload module did not expose WebUploader.');
-                    }
-                    if (typeof solanaUpload.WebSolana !== 'function') {
-                        throw new Error('Irys Solana adapter did not expose WebSolana.');
-                    }
-
-                    return {
-                        WebUploader: webUpload.WebUploader,
-                        WebSolana: solanaUpload.WebSolana
-                    };
-                })().catch(error => {
-                    // Allow a later retry after a transient CDN/network failure.
-                    irysModulesPromise = null;
-                    throw error;
-                });
-            }
-            return irysModulesPromise;
-        }
-
-        // Intro Screen Timer
+        // Intro Timer
         setTimeout(() => {
             const intro = document.getElementById('introScreen');
             const dashboard = document.getElementById('dashboardScreen');
-
             intro.style.opacity = '0';
-
             setTimeout(() => {
                 intro.style.display = 'none';
                 dashboard.style.display = 'block';
             }, 500);
-
         }, 3500);
 
-        // --- Tab Switcher with Fake Loading Screen ---
+        // ----- Tab Switcher -----
         let isSwitching = false;
         let currentMainTab = 'board';
         let isWizardOpen = false;
 
         function switchMainTab(targetTab) {
             if (isSwitching) return;
-
-            // If wizard is open, close it first
-            if (isWizardOpen) {
-                closeWizard(false);
-            }
+            if (isWizardOpen) closeWizard(false);
 
             const tabs = ['board', 'portfolio', 'inbox'];
             const targetBtnId = 'btn' + targetTab.charAt(0).toUpperCase() + targetTab.slice(1);
@@ -2581,7 +2493,6 @@ ${errors.join('\n')}`);
             if (!activeBtn || !activeView || activeBtn.classList.contains('active')) return;
 
             isSwitching = true;
-
             tabs.forEach(tab => {
                 const bId = 'btn' + tab.charAt(0).toUpperCase() + tab.slice(1);
                 const vId = 'view' + tab.charAt(0).toUpperCase() + tab.slice(1);
@@ -2599,10 +2510,9 @@ ${errors.join('\n')}`);
                 currentMainTab = targetTab;
             }, 450);
         }
-
         window.switchMainTab = switchMainTab;
 
-        // --- Token Wizard Controls ---
+        // ----- Token Wizard Controls -----
         const createBtn = document.getElementById('createBtn');
         const wizardView = document.getElementById('viewTokenWizard');
         const workspaceContent = document.getElementById('workspaceContent');
@@ -2611,7 +2521,6 @@ ${errors.join('\n')}`);
         const wizardCancelBtn = document.getElementById('wizardCancelBtn');
         const wizardLaunchBtn = document.getElementById('wizardLaunchBtn');
 
-        // Form fields
         const tokenName = document.getElementById('tokenName');
         const tokenTicker = document.getElementById('tokenTicker');
         const tokenDescription = document.getElementById('tokenDescription');
@@ -2620,36 +2529,33 @@ ${errors.join('\n')}`);
         const imagePreview = document.getElementById('imagePreview');
         const removeImageBtn = document.getElementById('removeImageBtn');
 
-        // Preview elements
         const previewName = document.getElementById('previewName');
         const previewTicker = document.getElementById('previewTicker');
         const previewDesc = document.getElementById('previewDesc');
         const previewImage = document.getElementById('previewImage');
-        const irysResultPanel = document.getElementById('irysResultPanel');
-        const irysResultStatus = document.getElementById('irysResultStatus');
-        const irysPayloadOutput = document.getElementById('irysPayloadOutput');
 
-        // The selected File is retained so it can be uploaded to Irys at launch time.
+        const pinataResultPanel = document.getElementById('pinataResultPanel');
+        const pinataResultStatus = document.getElementById('pinataResultStatus');
+        const pinataPayloadOutput = document.getElementById('pinataPayloadOutput');
+
         let selectedTokenImageFile = null;
         let lastLaunchPayload = null;
 
-        // Open wizard
         function openWizard() {
-            // Hide all tab views and show wizard
             document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active-view'));
             mainTabs.style.display = 'none';
             wizardView.classList.add('active-view');
             isWizardOpen = true;
+            pinataResultPanel.style.display = 'none';
+            pinataResultStatus.textContent = '';
+            pinataPayloadOutput.textContent = '';
         }
 
-        // Close wizard and return to previous tab
         function closeWizard(switchBack = true) {
             wizardView.classList.remove('active-view');
             mainTabs.style.display = 'flex';
             isWizardOpen = false;
-
             if (switchBack) {
-                // Re-activate the current main tab
                 const tabId = currentMainTab;
                 const btnId = 'btn' + tabId.charAt(0).toUpperCase() + tabId.slice(1);
                 const viewId = 'view' + tabId.charAt(0).toUpperCase() + tabId.slice(1);
@@ -2665,7 +2571,6 @@ ${errors.join('\n')}`);
 
         createBtn.addEventListener('click', () => {
             openWizard();
-            // Reset form
             tokenName.value = '';
             tokenTicker.value = '';
             tokenDescription.value = '';
@@ -2674,44 +2579,37 @@ ${errors.join('\n')}`);
             imagePreview.src = '';
             imagePreview.style.display = 'none';
             imageUploadArea.classList.remove('has-image');
-            irysResultPanel.style.display = 'none';
-            irysResultStatus.textContent = '';
-            irysPayloadOutput.textContent = '';
+            pinataResultPanel.style.display = 'none';
+            pinataResultStatus.textContent = '';
+            pinataPayloadOutput.textContent = '';
             updatePreview();
         });
 
         wizardBackBtn.addEventListener('click', () => closeWizard(true));
         wizardCancelBtn.addEventListener('click', () => closeWizard(true));
 
-        // Live preview updates
         function updatePreview() {
             previewName.textContent = tokenName.value || 'Token Name';
             previewTicker.textContent = tokenTicker.value ? '$' + tokenTicker.value.toUpperCase() : '$TICKER';
             previewDesc.textContent = tokenDescription.value || 'Your token description will appear here';
         }
-
         tokenName.addEventListener('input', updatePreview);
         tokenTicker.addEventListener('input', updatePreview);
         tokenDescription.addEventListener('input', updatePreview);
 
         // Image upload handling
-        imageUploadArea.addEventListener('click', () => {
-            imageInput.click();
-        });
+        imageUploadArea.addEventListener('click', () => imageInput.click());
 
         function setSelectedTokenImage(file) {
             if (!file || !file.type.startsWith('image/')) {
                 alert('Please select a valid image file.');
                 return false;
             }
-
             if (file.size > 2 * 1024 * 1024) {
                 alert('Please choose an image smaller than 2MB.');
                 return false;
             }
-
             selectedTokenImageFile = file;
-
             const reader = new FileReader();
             reader.onload = (ev) => {
                 const dataUrl = ev.target.result;
@@ -2741,18 +2639,16 @@ ${errors.join('\n')}`);
                 `<svg viewBox="0 0 24 24" style="width:24px;height:24px;stroke:#444444;stroke-width:1.5;fill:none;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>`;
         });
 
-        // Drag-and-drop support
+        // Drag & drop
         imageUploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             imageUploadArea.style.borderColor = '#6FB1FC';
             imageUploadArea.style.backgroundColor = '#1a1a2a';
         });
-
         imageUploadArea.addEventListener('dragleave', () => {
             imageUploadArea.style.borderColor = '#2a2a2a';
             imageUploadArea.style.backgroundColor = '#141414';
         });
-
         imageUploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
             imageUploadArea.style.borderColor = '#2a2a2a';
@@ -2761,7 +2657,6 @@ ${errors.join('\n')}`);
             if (files.length > 0) {
                 const file = files[0];
                 if (setSelectedTokenImage(file)) {
-                    // Keep the input in sync so the selected file is preserved in the form state.
                     const dt = new DataTransfer();
                     dt.items.add(file);
                     imageInput.files = dt.files;
@@ -2769,60 +2664,40 @@ ${errors.join('\n')}`);
             }
         });
 
-        // --- Irys-backed token launch preparation ---
-        // The image is uploaded only when the user presses Launch Token. Irys uses
-        // the currently connected wallet provider to request the required signature.
-        let irysUploader = null;
-        let irysUploaderAddress = null;
+        // ----- PINATA UPLOAD (native fetch) -----
+        // Replace this JWT with your own from https://app.pinata.cloud/developers/api-keys
+        const PINATA_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJmZjAzZTUyOS05NTA2LTRmODQtYjJjYi01MmRjMzU2Y2M2YzkiLCJlbWFpbCI6InlvdXJAZW1haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJGUkExIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImI5ZjU3YmI3ZmU4NzQwY2RjN2I4Iiwic2NvcGVkS2V5U2VjcmV0IjoiNmQyODZhM2Q5NDY5MjIxNjc2MmQ0NzhhNzFlYWIyZGIxYjE4MjhjMzI3ZDY3YjEzMTZiYjVmNDI4YTY3ODBlMyIsImlhdCI6MTc0NDk3ODI1OX0.ZtHOHfAkhHmtMWLgb34bFeYxNqDwQCvNhyU-HDCRKrc';
 
-        async function getIrysUploader() {
-            if (!activeProvider || !activePublicKey) {
-                throw new Error('Connect a Solana wallet before launching a token.');
+        async function uploadToPinata(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${PINATA_JWT}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                let errMsg = `Pinata upload failed (HTTP ${response.status})`;
+                try {
+                    const errData = await response.json();
+                    if (errData?.error) errMsg += `: ${errData.error}`;
+                } catch (_) { /* ignore */ }
+                throw new Error(errMsg);
             }
 
-            // Rebuild when the connected provider/account changes.
-            if (irysUploader && irysUploaderAddress === activePublicKey.toString()) {
-                return irysUploader;
-            }
-
-            const { WebUploader, WebSolana } = await loadIrysModules();
-            if (typeof WebUploader !== 'function' || typeof WebSolana !== 'function') {
-                throw new Error('Irys browser modules loaded without the expected Solana uploader exports.');
-            }
-
-            const builder = WebUploader(WebSolana).withProvider(activeProvider);
-            if (typeof builder.withRpc !== 'function' || typeof builder.devnet !== 'function') {
-                throw new Error('The Irys browser SDK loaded, but its Devnet builder API is unavailable.');
-            }
-            irysUploader = await builder
-                .withRpc(DEVNET_RPC)
-                .devnet();
-
-            irysUploaderAddress = activePublicKey.toString();
-            return irysUploader;
-        }
-
-        async function uploadTokenImageToIrys(file) {
-            const uploader = await getIrysUploader();
-
-            // Irys automatically handles the file content type, but explicitly tagging
-            // it makes the resulting gateway URL reliably render as an image.
-            const tags = [
-                { name: 'application-id', value: 'ConfluenceTokenLaunch' },
-                { name: 'Content-Type', value: file.type || 'application/octet-stream' }
-            ];
-
-            // Browser uploads are signed by the wallet provider passed above.
-            const receipt = await uploader.upload(file, { tags });
-
-            if (!receipt?.id) {
-                throw new Error('Irys upload completed without a transaction ID.');
+            const data = await response.json();
+            if (!data.IpfsHash) {
+                throw new Error('Pinata did not return an IPFS hash.');
             }
 
             return {
-                id: receipt.id,
-                url: `https://gateway.irys.xyz/${receipt.id}`,
-                signature: receipt.signature || null
+                id: data.IpfsHash,
+                url: `https://gateway.pinata.cloud/ipfs/${data.IpfsHash}`,
+                raw: data
             };
         }
 
@@ -2838,7 +2713,7 @@ ${errors.join('\n')}`);
 
         wizardLaunchBtn.addEventListener('click', async () => {
             if (!activePublicKey || !activeProvider) {
-                alert('Connect your Solana wallet first. The connected wallet will sign the Irys upload.');
+                alert('Connect your Solana wallet first. The connected wallet will be used as the token creator.');
                 return;
             }
 
@@ -2856,53 +2731,60 @@ ${errors.join('\n')}`);
                 return;
             }
 
-            setLaunchButtonBusy(true, 'Uploading Image…');
+            setLaunchButtonBusy(true, 'Uploading to Pinata…');
 
             try {
-                const uploadedImage = await uploadTokenImageToIrys(selectedTokenImageFile);
+                // 1. Upload the image to Pinata
+                const uploaded = await uploadToPinata(selectedTokenImageFile);
 
-                // This is the exact shape that the future Solana Devnet program can consume.
-                // For now it is only prepared and displayed; no program instruction is sent yet.
+                // 2. Build the full payload that will eventually be sent to the Solana devnet program
+                const now = new Date().toISOString();
                 lastLaunchPayload = {
                     name,
                     ticker,
                     description: desc,
-                    imageUrl: uploadedImage.url,
-                    imageIrysId: uploadedImage.id,
-                    imageUploadSignature: uploadedImage.signature,
+                    imageUrl: uploaded.url,
+                    imagePinataId: uploaded.id,
+                    imageUploadTimestamp: now,
                     creator: activePublicKey.toString(),
-                    network: 'solana-devnet'
+                    network: 'solana-devnet',
+                    // Additional fields that a Solana program might expect
+                    metadata: {
+                        version: '1.0',
+                        standard: 'confluence-token-v1',
+                        created_at: now
+                    }
                 };
 
-                console.log('Token launch payload ready for the future Solana Devnet program:', lastLaunchPayload);
+                console.log('✅ Pinata upload successful. Payload ready for Solana devnet program:', lastLaunchPayload);
 
-                irysResultPanel.style.display = 'block';
-                irysResultStatus.textContent = `Image uploaded successfully. URL: ${uploadedImage.url}. No Solana deployment transaction has been submitted yet.`;
-                irysPayloadOutput.textContent = JSON.stringify(lastLaunchPayload, null, 2);
-                irysResultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                // 3. Display the result
+                pinataResultPanel.style.display = 'block';
+                pinataResultStatus.textContent =
+                    `✅ Image uploaded to Pinata (IPFS).\nCID: ${uploaded.id}\nGateway URL: ${uploaded.url}\n\nNo Solana program transaction has been submitted yet — this is the payload that will be sent to the devnet contract.`;
+
+                pinataPayloadOutput.textContent = JSON.stringify(lastLaunchPayload, null, 2);
+
+                // Auto-scroll so the user sees the result
+                pinataResultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
             } catch (error) {
-                console.error('Irys token image upload failed:', error);
+                console.error('Pinata upload error:', error);
                 const rawMessage = error?.message || String(error) || 'Unknown error';
-                const friendlyMessage = rawMessage.includes('402') || rawMessage.toLowerCase().includes('not enough balance')
-                    ? 'Irys Devnet rejected the upload because the Irys Devnet account needs faucet funds. No Solana deployment transaction was submitted.'
-                    : `Irys upload failed: ${rawMessage}`;
-                irysResultPanel.style.display = 'block';
-                irysResultStatus.textContent = friendlyMessage;
-                irysPayloadOutput.textContent = '';
+                const friendlyMessage = `Pinata upload failed: ${rawMessage}`;
+                pinataResultPanel.style.display = 'block';
+                pinataResultStatus.textContent = `❌ ${friendlyMessage}`;
+                pinataPayloadOutput.textContent = '';
                 alert(friendlyMessage);
             } finally {
                 setLaunchButtonBusy(false, 'Launch Token');
             }
         });
 
-        // --- REAL SOLANA DEVNET WALLET CONNECTIVITY ---
+        // ----- REAL SOLANA DEVNET WALLET CONNECTIVITY -----
         const DEVNET_RPC = solanaWeb3.clusterApiUrl('devnet');
         const connection = new solanaWeb3.Connection(DEVNET_RPC, 'confirmed');
-
-        // Official Circle Devnet USDC SPL token mint.
-        const USDC_MINT = new solanaWeb3.PublicKey(
-            '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
-        );
+        const USDC_MINT = new solanaWeb3.PublicKey('4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU');
         const USDC_DECIMALS = 6;
         const WALLET_CONNECTED_FLAG = 'wallet_connected_flag';
 
@@ -2926,8 +2808,6 @@ ${errors.join('\n')}`);
         const popoverSolBalance = document.getElementById('popoverSolBalance');
         const popoverUsdcBalance = document.getElementById('popoverUsdcBalance');
 
-        // The current provider is kept only in memory. No private key or seed phrase
-        // is ever requested or stored.
         let activeProvider = null;
         let activeWalletName = null;
         let activePublicKey = null;
@@ -2935,38 +2815,27 @@ ${errors.join('\n')}`);
 
         function shortAddress(address) {
             if (!address) return 'Not Connected';
-            return address.length > 10 ?
-                `${address.slice(0, 4)}...${address.slice(-4)}` :
-                address;
+            return address.length > 10 ? `${address.slice(0, 4)}...${address.slice(-4)}` : address;
         }
 
         function setScannerMessage(message) {
-            const messageEl = walletStep2.querySelector('.scanner-loader-wrap span');
-            if (messageEl) messageEl.textContent = message;
+            const el = walletStep2.querySelector('.scanner-loader-wrap span');
+            if (el) el.textContent = message;
         }
 
         function getProviderCandidates() {
             const candidates = [];
+            const phantom = window.phantom?.solana || (window.solana?.isPhantom ? window.solana : null);
+            if (phantom) candidates.push({ name: 'Phantom', provider: phantom });
 
-            // Phantom exposes window.phantom.solana and, in many browsers,
-            // window.solana. Prefer the explicit namespace when available.
-            const phantomProvider = window.phantom?.solana ||
-                (window.solana?.isPhantom ? window.solana : null);
-            if (phantomProvider) {
-                candidates.push({ name: 'Phantom', provider: phantomProvider });
+            const solflare = window.solflare || (window.solana?.isSolflare ? window.solana : null);
+            if (solflare && !candidates.some(item => item.provider === solflare)) {
+                candidates.push({ name: 'Solflare', provider: solflare });
             }
 
-            const solflareProvider = window.solflare ||
-                (window.solana?.isSolflare ? window.solana : null);
-            if (solflareProvider && !candidates.some(item => item.provider === solflareProvider)) {
-                candidates.push({ name: 'Solflare', provider: solflareProvider });
-            }
-
-            // Backpack commonly exposes its Solana provider under window.backpack.solana.
-            const backpackProvider = window.backpack?.solana ||
-                (window.backpack?.isBackpack ? window.backpack : null);
-            if (backpackProvider && !candidates.some(item => item.provider === backpackProvider)) {
-                candidates.push({ name: 'Backpack', provider: backpackProvider });
+            const backpack = window.backpack?.solana || (window.backpack?.isBackpack ? window.backpack : null);
+            if (backpack && !candidates.some(item => item.provider === backpack)) {
+                candidates.push({ name: 'Backpack', provider: backpack });
             }
 
             return candidates.filter(item => item.provider && typeof item.provider.connect === 'function');
@@ -2988,7 +2857,6 @@ ${errors.join('\n')}`);
             walletModalOverlay.classList.remove('show');
             dashboardScreen.classList.remove('blurred');
         }
-
         window.closeWalletModal = closeWalletModal;
 
         function resetPortfolioButtons() {
@@ -3022,11 +2890,7 @@ ${errors.join('\n')}`);
             const usdc = Number(usdcBalance);
 
             connectBtnText.textContent = short;
-
-            // Wallet badge shows SOL balance — this is the wallet balance, NOT portfolio value.
             badgeBalanceText.textContent = `${sol.toFixed(2)} SOL`;
-
-            // Portfolio value remains $0 — it only counts investments & returns on memcoins.
             portfolioTotalVal.textContent = '$0';
 
             popoverWalletAddress.textContent = short;
@@ -3053,28 +2917,21 @@ ${errors.join('\n')}`);
         async function fetchWalletBalances(publicKey) {
             const [lamports, tokenAccounts] = await Promise.all([
                 connection.getBalance(publicKey, 'confirmed'),
-                connection.getParsedTokenAccountsByOwner(
-                    publicKey, { mint: USDC_MINT },
-                    'confirmed'
-                )
+                connection.getParsedTokenAccountsByOwner(publicKey, { mint: USDC_MINT }, 'confirmed')
             ]);
 
             const solBalance = lamports / solanaWeb3.LAMPORTS_PER_SOL;
-
             let rawUsdcAmount = 0n;
             for (const account of tokenAccounts.value) {
                 const amount = account.account.data.parsed?.info?.tokenAmount?.amount;
                 if (amount) rawUsdcAmount += BigInt(amount);
             }
-
             const usdcBalance = Number(rawUsdcAmount) / (10 ** USDC_DECIMALS);
-
             return { solBalance, usdcBalance };
         }
 
         async function refreshWalletBalances() {
             if (!activePublicKey || balanceRefreshInFlight) return;
-
             balanceRefreshInFlight = true;
             try {
                 const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
@@ -3093,34 +2950,23 @@ ${errors.join('\n')}`);
 
         function bindProviderEvents(provider) {
             if (!provider || typeof provider.on !== 'function') return;
-
-            // Avoid stacking listeners if the same extension provider is selected again.
             if (provider.__confluenceListenersBound) return;
             provider.__confluenceListenersBound = true;
 
             provider.on('disconnect', () => {
-                if (activeProvider === provider) {
-                    disconnectWallet(false);
-                }
+                if (activeProvider === provider) disconnectWallet(false);
             });
 
             provider.on('accountChanged', async (publicKey) => {
                 if (activeProvider !== provider) return;
-
                 if (!publicKey) {
                     await disconnectWallet(false);
                     return;
                 }
-
                 try {
                     activePublicKey = publicKey instanceof solanaWeb3.PublicKey ?
                         publicKey :
                         new solanaWeb3.PublicKey(publicKey.toString());
-
-                    // Force Irys to bind to the newly selected wallet account.
-                    irysUploader = null;
-                    irysUploaderAddress = null;
-
                     const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
                     applyWalletSession({
                         name: activeWalletName || 'Wallet',
@@ -3139,10 +2985,7 @@ ${errors.join('\n')}`);
             if (!provider || typeof provider.connect !== 'function') {
                 throw new Error(`${walletName} provider is not available.`);
             }
-
-            // This is the actual wallet handshake. The extension owns the approval UI.
             const response = await provider.connect(options);
-
             const publicKeyValue = response?.publicKey || provider.publicKey;
             if (!publicKeyValue) {
                 throw new Error(`${walletName} did not return a public key.`);
@@ -3150,8 +2993,6 @@ ${errors.join('\n')}`);
 
             activeProvider = provider;
             activeWalletName = walletName;
-            irysUploader = null;
-            irysUploaderAddress = null;
             activePublicKey = publicKeyValue instanceof solanaWeb3.PublicKey ?
                 publicKeyValue :
                 new solanaWeb3.PublicKey(publicKeyValue.toString());
@@ -3159,7 +3000,6 @@ ${errors.join('\n')}`);
             bindProviderEvents(provider);
 
             const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
-
             applyWalletSession({
                 name: walletName,
                 publicKey: activePublicKey,
@@ -3171,14 +3011,12 @@ ${errors.join('\n')}`);
             closeWalletModal();
         }
 
-        // Step 1 -> real browser extension discovery.
+        // Step 1 -> real browser extension discovery
         async function scanForSolanaWallets() {
             walletStep1.style.display = 'none';
             walletStep2.style.display = 'flex';
             setScannerMessage('Scanning browser extensions for active Solana wallets...');
 
-            // Give the browser a microtask to finish exposing injected providers,
-            // but do not use a fake timed "scan".
             await new Promise(resolve => setTimeout(resolve, 0));
 
             const detected = getProviderCandidates();
@@ -3192,23 +3030,17 @@ ${errors.join('\n')}`);
                 const name = item.querySelector('.wallet-option-name')?.textContent?.trim();
                 const providerEntry = detected.find(candidate => candidate.name === name);
                 const badge = item.querySelector('.wallet-detected-badge');
-
-                // Remove the old fake inline handlers so only the real provider
-                // connection path runs.
                 item.removeAttribute('onclick');
 
                 if (!providerEntry) {
                     item.style.display = 'none';
                     return;
                 }
-
                 item.style.display = 'flex';
                 if (badge) badge.textContent = 'Detected';
 
-                // Clone the node so a repeated scan never creates duplicate listeners.
                 const freshItem = item.cloneNode(true);
                 item.replaceWith(freshItem);
-
                 freshItem.addEventListener('click', () => {
                     selectSolanaWallet(name);
                 });
@@ -3226,18 +3058,15 @@ ${errors.join('\n')}`);
             }
         }
 
-        // Step 3 -> real provider.connect() handshake.
+        // Step 3 -> real provider.connect() handshake
         async function selectSolanaWallet(walletName) {
             const provider = getProviderByName(walletName);
-
             if (!provider) {
                 console.warn(`${walletName} provider is no longer available.`);
                 await scanForSolanaWallets();
                 return;
             }
-
             try {
-                // The browser extension will show its own approval prompt here.
                 await connectToProvider(provider, walletName);
             } catch (error) {
                 console.error(`${walletName} connection failed:`, error);
@@ -3248,7 +3077,6 @@ ${errors.join('\n')}`);
                 walletStep2.style.display = 'flex';
             }
         }
-
         window.selectSolanaWallet = selectSolanaWallet;
 
         connectBtn.addEventListener('click', () => {
@@ -3270,35 +3098,23 @@ ${errors.join('\n')}`);
         });
 
         cancelWalletModalBtn.addEventListener('click', closeWalletModal);
-
-        // "Understood" now performs the real provider discovery step.
         understoodWalletBtn.addEventListener('click', scanForSolanaWallets);
 
-        // --- DISCONNECT PIPELINE ---
+        // Disconnect pipeline
         async function disconnectWallet(callProviderDisconnect = true) {
             const provider = activeProvider;
-
             activeProvider = null;
             activeWalletName = null;
             activePublicKey = null;
-            irysUploader = null;
-            irysUploaderAddress = null;
             localStorage.removeItem(WALLET_CONNECTED_FLAG);
-
             resetWalletUI();
             profilePopover.classList.remove('show');
             closeWalletModal();
-
             if (callProviderDisconnect && provider && typeof provider.disconnect === 'function') {
-                try {
-                    await provider.disconnect();
-                } catch (error) {
-                    console.warn('Wallet provider disconnect failed:', error);
-                }
+                try { await provider.disconnect(); } catch (error) { console.warn('Provider disconnect failed:', error); }
             }
         }
 
-        // Add a disconnect button inside the profile popover.
         const disconnectBtn = document.createElement('div');
         disconnectBtn.id = 'disconnectWalletBtn';
         disconnectBtn.textContent = 'Disconnect Wallet';
@@ -3316,7 +3132,6 @@ ${errors.join('\n')}`);
             event.stopPropagation();
             await disconnectWallet(true);
         };
-
         disconnectBtn.addEventListener('click', handleDisconnectClick);
         disconnectBtn.addEventListener('keydown', async (event) => {
             if (event.key === 'Enter' || event.key === ' ') {
@@ -3329,61 +3144,40 @@ ${errors.join('\n')}`);
             disconnectBtn.style.display = activePublicKey ? 'block' : 'none';
         }
 
-        // Profile Popover Toggle
         profileBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             profilePopover.classList.toggle('show');
         });
+        profilePopover.addEventListener('click', (e) => e.stopPropagation());
+        document.addEventListener('click', () => profilePopover.classList.remove('show'));
 
-        profilePopover.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
-        document.addEventListener('click', () => {
-            profilePopover.classList.remove('show');
-        });
-
-        // Optional header/profile settings compatibility:
-        window.addEventListener('confluence:logout', () => disconnectWallet(true));
-
-        // Auto-connect persistence:
+        // Auto-connect persistence
         window.addEventListener('load', async () => {
             if (localStorage.getItem(WALLET_CONNECTED_FLAG) !== 'true') return;
-
             const detected = getProviderCandidates();
             if (detected.length === 0) return;
-
-            // Prefer the provider currently holding a public key, otherwise try each
-            // detected provider silently until one is trusted.
             const providersToTry = [...detected].sort((a, b) => {
                 const aHasKey = !!a.provider.publicKey;
                 const bHasKey = !!b.provider.publicKey;
                 return Number(bHasKey) - Number(aHasKey);
             });
-
             for (const { name, provider } of providersToTry) {
                 try {
-                    // Required silent trusted-session query.
                     await connectToProvider(provider, name, { onlyIfTrusted: true });
                     return;
                 } catch (error) {
-                    // A rejected onlyIfTrusted call means this provider is not
-                    // currently trusted; continue without opening any modal.
                     console.debug(`${name} silent auto-connect unavailable.`, error);
                 }
             }
         });
 
-        // Start in the same visual disconnected state as the original template.
         resetWalletUI();
 
-        // Keep the displayed wallet balances current while connected instead of only
-        // fetching once at connection time. The in-flight guard prevents overlapping RPC calls.
+        // Balance refresh interval
         const BALANCE_REFRESH_INTERVAL_MS = 10000;
         setInterval(() => {
             if (activePublicKey) refreshWalletBalances();
         }, BALANCE_REFRESH_INTERVAL_MS);
     </script>
-
 </body>
 </html>
