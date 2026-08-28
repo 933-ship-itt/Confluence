@@ -2401,9 +2401,13 @@
                     </div>
                 </div>
                 <div id="irysResultPanel" style="display:none; margin-top:18px; padding:16px; background:#0d0d0d; border:1px solid #214d3c; border-radius:14px; width:100%; box-sizing:border-box;">
-                    <div style="font-size:12px; font-weight:700; color:#10B981; text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px;">Irys Upload Result</div>
+                    <div style="font-size:12px; font-weight:700; color:#10B981; text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px;">Token Program Payload</div>
                     <div id="irysResultStatus" style="font-size:13px; color:#d7d7d7; margin-bottom:10px;"></div>
-                    <pre id="irysPayloadOutput" style="margin:0; white-space:pre-wrap; word-break:break-word; font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; color:#b9c7d8; background:#090909; border:1px solid #1d2924; border-radius:10px; padding:12px; max-height:260px; overflow:auto;"></pre>
+                    <pre id="irysPayloadOutput" style="margin:0; white-space:pre-wrap; word-break:break-word; font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; color:#b9c7d8; background:#090909; border:1px solid #1d2924; border-radius:10px; padding:12px; max-height:320px; overflow:auto;"></pre>
+                    <div id="irysLogWrap" style="display:none; margin-top:12px;">
+                        <div style="font-size:11px; font-weight:700; color:#888888; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px;">Irys Debug Log</div>
+                        <pre id="irysDebugOutput" style="margin:0; white-space:pre-wrap; word-break:break-word; font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; color:#9aa8b5; background:#090909; border:1px solid #1d2924; border-radius:10px; padding:12px; max-height:180px; overflow:auto;"></pre>
+                    </div>
                 </div>
                 <!-- ===== END TOKEN CREATION WIZARD ===== -->
 
@@ -2586,6 +2590,34 @@
         const irysResultPanel = document.getElementById('irysResultPanel');
         const irysResultStatus = document.getElementById('irysResultStatus');
         const irysPayloadOutput = document.getElementById('irysPayloadOutput');
+        const irysLogWrap = document.getElementById('irysLogWrap');
+        const irysDebugOutput = document.getElementById('irysDebugOutput');
+        const irysUploadLogs = [];
+
+        function logIrys(step, details) {
+            const entry = {
+                time: new Date().toISOString(),
+                step,
+                details: details === undefined ? null : details
+            };
+            irysUploadLogs.push(entry);
+            console.log(`[Irys] ${step}`, details ?? '');
+            if (irysDebugOutput) {
+                irysDebugOutput.textContent = irysUploadLogs
+                    .map((item) => `${item.time}  ${item.step}${item.details != null ? '  ' + JSON.stringify(item.details) : ''}`)
+                    .join('\n');
+            }
+        }
+
+        function resetIrysLogs() {
+            irysUploadLogs.length = 0;
+            if (irysDebugOutput) irysDebugOutput.textContent = '';
+            if (irysLogWrap) irysLogWrap.style.display = 'none';
+        }
+
+        function showIrysLogs() {
+            if (irysLogWrap) irysLogWrap.style.display = 'block';
+        }
 
         // The selected File is retained so it can be uploaded to Irys at launch time.
         let selectedTokenImageFile = null;
@@ -2635,6 +2667,7 @@
             irysResultPanel.style.display = 'none';
             irysResultStatus.textContent = '';
             irysPayloadOutput.textContent = '';
+            resetIrysLogs();
             updatePreview();
         });
 
@@ -2801,7 +2834,8 @@
             }
             const bytes = chunk instanceof Uint8Array ? chunk : textEncoder.encode(String(chunk));
             const tag = concatBytes([textEncoder.encode('blob'), textEncoder.encode(String(bytes.byteLength))]);
-            return sha384(concatBytes([tag, bytes]));
+            // Official ANS-104 deep hash hashes the tag and payload separately.
+            return sha384(concatBytes([await sha384(tag), await sha384(bytes)]));
         }
 
         function toBase64Url(bytes) {
@@ -2843,9 +2877,9 @@
 
             const attempts = [];
             if (typeof provider.signMessage === 'function') {
-                attempts.push(() => provider.signMessage(message, 'hex'));
-                attempts.push(() => provider.signMessage(message, { display: 'hex' }));
                 attempts.push(() => provider.signMessage(message));
+                attempts.push(() => provider.signMessage(message, 'utf8'));
+                attempts.push(() => provider.signMessage(message, 'hex'));
             }
             if (provider.signMessage && provider.publicKey && typeof provider.signMessage !== 'function') {
                 // no-op guard
@@ -2856,7 +2890,13 @@
                 try {
                     const signed = await attempt();
                     const bytes = normalizeSignatureBytes(signed);
-                    if (bytes.byteLength === IRYS_SOLANA_SIGNATURE_LENGTH) return bytes;
+                    if (bytes.byteLength === IRYS_SOLANA_SIGNATURE_LENGTH) {
+                        logIrys('sign.success', {
+                            signer: activePublicKey ? activePublicKey.toString() : null,
+                            signatureBytes: bytes.byteLength
+                        });
+                        return bytes;
+                    }
                     lastError = new Error(`Wallet signature was ${bytes.byteLength} bytes, expected ${IRYS_SOLANA_SIGNATURE_LENGTH}.`);
                 } catch (error) {
                     lastError = error;
@@ -2904,22 +2944,22 @@
 
         async function postIrysDataItem(itemBytes) {
             const endpoints = [
-                `${IRYS_DEVNET_URL}/tx/solana`,
-                `${IRYS_DEVNET_URL}/tx`
+                `${IRYS_DEVNET_URL}/tx/solana`
             ];
 
             let lastError = null;
             for (const url of endpoints) {
                 try {
+                    logIrys('post.start', { url, bytes: itemBytes.byteLength });
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/octet-stream' },
                         body: itemBytes
                     });
                     const text = await response.text();
+                    logIrys('post.response', { url, status: response.status, body: text.slice(0, 500) });
                     if (!response.ok) {
                         lastError = new Error(`${response.status} ${text || response.statusText}`);
-                        if (response.status === 402) throw lastError;
                         continue;
                     }
                     try {
@@ -2929,7 +2969,7 @@
                     }
                 } catch (error) {
                     lastError = error;
-                    if (String(error?.message || error).includes('402')) throw error;
+                    logIrys('post.error', { url, message: error?.message || String(error) });
                 }
             }
             throw lastError || new Error('Irys Devnet did not accept the upload.');
@@ -3063,7 +3103,22 @@
                 throw new Error('Connect a Solana wallet before launching a token.');
             }
 
+            const signerAddress = activePublicKey.toString();
+            logIrys('upload.start', {
+                wallet: activeWalletName,
+                signer: signerAddress,
+                fileName: file.name,
+                fileType: file.type,
+                fileBytes: file.size
+            });
+
             const prepared = await prepareImageBytesForIrys(file);
+            logIrys('upload.prepared-image', {
+                contentType: prepared.contentType,
+                bytes: prepared.bytes.byteLength,
+                compressed: prepared.bytes.byteLength !== file.size
+            });
+
             const tags = [
                 { name: 'application-id', value: 'ConfluenceTokenLaunch' },
                 { name: 'Content-Type', value: prepared.contentType },
@@ -3071,11 +3126,18 @@
             ];
 
             await fundIrysDevnetIfNeeded(prepared.bytes.byteLength);
+            logIrys('upload.funding-checked', { bytes: prepared.bytes.byteLength });
 
             const ownerBytes = publicKeyToBytes(activePublicKey);
             if (ownerBytes.byteLength !== IRYS_SOLANA_OWNER_LENGTH) {
                 throw new Error('Connected wallet public key is not a 32-byte Solana key.');
             }
+
+            logIrys('upload.sign-request', {
+                signer: signerAddress,
+                signatureType: IRYS_SOLANA_SIGNATURE_TYPE,
+                ownerBytes: ownerBytes.byteLength
+            });
 
             const signed = await createSignedSolanaDataItem(
                 prepared.bytes,
@@ -3084,11 +3146,19 @@
                 activeProvider
             );
 
+            logIrys('upload.signed', {
+                signer: signerAddress,
+                dataItemId: signed.id,
+                itemBytes: signed.item.byteLength
+            });
+
             const receipt = await postIrysDataItem(signed.item);
             const id = receipt?.id || signed.id;
             if (!id) {
                 throw new Error('Irys upload completed without a transaction ID.');
             }
+
+            logIrys('upload.success', { id, receipt });
 
             return {
                 id,
@@ -3127,39 +3197,93 @@
                 return;
             }
 
+            resetIrysLogs();
+            showIrysLogs();
             setLaunchButtonBusy(true, 'Signing Irys Upload…');
 
             try {
                 const uploadedImage = await uploadTokenImageToIrys(selectedTokenImageFile);
+                const createdAt = new Date().toISOString();
 
-                // This is the exact shape that the future Solana Devnet program can consume.
-                // For now it is only prepared and displayed; no program instruction is sent yet.
                 lastLaunchPayload = {
-                    name,
-                    ticker,
-                    description: desc,
-                    imageUrl: uploadedImage.url,
-                    imageIrysId: uploadedImage.id,
-                    imageUploadSignature: uploadedImage.signature,
-                    creator: activePublicKey.toString(),
-                    network: 'solana-devnet'
+                    instruction: 'initialize_token',
+                    program: {
+                        cluster: 'solana-devnet',
+                        rpc: 'https://api.devnet.solana.com',
+                        programId: null,
+                        note: 'Program ID will be filled after the Solana Devnet program is deployed.'
+                    },
+                    accounts: {
+                        creator: activePublicKey.toString(),
+                        creatorWalletName: activeWalletName,
+                        mint: null,
+                        metadata: null
+                    },
+                    token: {
+                        name,
+                        symbol: ticker,
+                        ticker,
+                        decimals: 6,
+                        description: desc,
+                        image: uploadedImage.url,
+                        external_url: uploadedImage.url
+                    },
+                    irys: {
+                        network: 'irys-devnet',
+                        bundler: 'https://devnet.irys.xyz',
+                        imageId: uploadedImage.id,
+                        imageUrl: uploadedImage.url,
+                        imageContentType: selectedTokenImageFile.type || 'image/*',
+                        imageUploadSignature: uploadedImage.signature,
+                        signedBy: activePublicKey.toString()
+                    },
+                    metadata: {
+                        name,
+                        symbol: ticker,
+                        description: desc,
+                        image: uploadedImage.url,
+                        properties: {
+                            files: [
+                                {
+                                    uri: uploadedImage.url,
+                                    type: selectedTokenImageFile.type || 'image/*'
+                                }
+                            ],
+                            category: 'image',
+                            creators: [
+                                {
+                                    address: activePublicKey.toString(),
+                                    share: 100
+                                }
+                            ]
+                        }
+                    },
+                    createdAt,
+                    status: 'irys_upload_success_pending_solana_deploy'
                 };
 
-                console.log('Token launch payload ready for the future Solana Devnet program:', lastLaunchPayload);
-
                 irysResultPanel.style.display = 'block';
-                irysResultStatus.textContent = `Image uploaded successfully. URL: ${uploadedImage.url}. No Solana deployment transaction has been submitted yet.`;
+                irysResultStatus.textContent = 'Irys upload succeeded. This JSON is the exact token payload to send to the future Solana Devnet program.';
                 irysPayloadOutput.textContent = JSON.stringify(lastLaunchPayload, null, 2);
+                irysLogWrap.style.display = 'none';
                 irysResultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             } catch (error) {
                 console.error('Irys token image upload failed:', error);
+                logIrys('upload.failed', { message: error?.message || String(error) });
                 const rawMessage = error?.message || String(error) || 'Unknown error';
                 const friendlyMessage = rawMessage.includes('402') || rawMessage.toLowerCase().includes('not enough balance')
                     ? 'Irys Devnet rejected the upload because the Irys Devnet account needs faucet funds. No Solana deployment transaction was submitted.'
                     : `Irys upload failed: ${rawMessage}`;
                 irysResultPanel.style.display = 'block';
                 irysResultStatus.textContent = friendlyMessage;
-                irysPayloadOutput.textContent = '';
+                irysPayloadOutput.textContent = JSON.stringify({
+                    status: 'irys_upload_failed',
+                    error: rawMessage,
+                    signer: activePublicKey ? activePublicKey.toString() : null,
+                    wallet: activeWalletName,
+                    logs: irysUploadLogs
+                }, null, 2);
+                showIrysLogs();
                 alert(friendlyMessage);
             } finally {
                 setLaunchButtonBusy(false, 'Launch Token');
