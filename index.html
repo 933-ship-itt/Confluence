@@ -2493,17 +2493,52 @@
         import * as solanaWeb3 from 'https://esm.sh/@solana/web3.js@1.98.4';
         // Irys is intentionally loaded lazily. A broken/slow third-party Irys module
         // must never prevent the dashboard and intro screen from initializing.
+        // The Solana web adapter is kept on the 0.1.7 line alongside web-upload 0.0.14
+        // to avoid the dependency/export mismatch seen with newer combinations.
         let irysModulesPromise = null;
+
+        async function importFirstWorking(candidates, label) {
+            const errors = [];
+            for (const url of candidates) {
+                try {
+                    return await import(url);
+                } catch (error) {
+                    errors.push(`${url}: ${error?.message || error}`);
+                }
+            }
+            throw new Error(`Unable to load ${label}.
+${errors.join('\n')}`);
+        }
 
         async function loadIrysModules() {
             if (!irysModulesPromise) {
-                irysModulesPromise = Promise.all([
-                    import('https://esm.sh/@irys/web-upload@0.0.15?bundle'),
-                    import('https://esm.sh/@irys/web-upload-solana@0.1.8?bundle')
-                ]).then(([webUpload, solanaUpload]) => ({
-                    WebUploader: webUpload.WebUploader,
-                    WebSolana: solanaUpload.WebSolana
-                }));
+                irysModulesPromise = (async () => {
+                    const webUpload = await importFirstWorking([
+                        'https://esm.sh/@irys/web-upload@0.0.14?target=es2020&bundle',
+                        'https://cdn.jsdelivr.net/npm/@irys/web-upload@0.0.14/+esm'
+                    ], 'Irys web-upload');
+
+                    const solanaUpload = await importFirstWorking([
+                        'https://esm.sh/@irys/web-upload-solana@0.1.7?target=es2020&bundle',
+                        'https://cdn.jsdelivr.net/npm/@irys/web-upload-solana@0.1.7/+esm'
+                    ], 'Irys Solana web adapter');
+
+                    if (typeof webUpload.WebUploader !== 'function') {
+                        throw new Error('Irys web-upload module did not expose WebUploader.');
+                    }
+                    if (typeof solanaUpload.WebSolana !== 'function') {
+                        throw new Error('Irys Solana adapter did not expose WebSolana.');
+                    }
+
+                    return {
+                        WebUploader: webUpload.WebUploader,
+                        WebSolana: solanaUpload.WebSolana
+                    };
+                })().catch(error => {
+                    // Allow a later retry after a transient CDN/network failure.
+                    irysModulesPromise = null;
+                    throw error;
+                });
             }
             return irysModulesPromise;
         }
