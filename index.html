@@ -2491,57 +2491,15 @@
         // Solana Web3 SDK is loaded as an ES module so this standalone HTML file
         // can use real Devnet RPC calls without a bundler.
         import * as solanaWeb3 from 'https://esm.sh/@solana/web3.js@1.98.4';
-        // Irys is intentionally loaded lazily. A broken/slow third-party Irys module
-        // must never prevent the dashboard and intro screen from initializing.
-        // The Solana web adapter is kept on the 0.1.7 line alongside web-upload 0.0.14
-        // to avoid the dependency/export mismatch seen with newer combinations.
-        let irysModulesPromise = null;
 
-        async function importFirstWorking(candidates, label) {
-            const errors = [];
-            for (const url of candidates) {
-                try {
-                    return await import(url);
-                } catch (error) {
-                    errors.push(`${url}: ${error?.message || error}`);
-                }
-            }
-            throw new Error(`Unable to load ${label}.
-${errors.join('\n')}`);
-        }
-
-        async function loadIrysModules() {
-            if (!irysModulesPromise) {
-                irysModulesPromise = (async () => {
-                    const webUpload = await importFirstWorking([
-                        'https://esm.sh/@irys/web-upload@0.0.14?target=es2020&bundle',
-                        'https://cdn.jsdelivr.net/npm/@irys/web-upload@0.0.14/+esm'
-                    ], 'Irys web-upload');
-
-                    const solanaUpload = await importFirstWorking([
-                        'https://esm.sh/@irys/web-upload-solana@0.1.7?target=es2020&bundle',
-                        'https://cdn.jsdelivr.net/npm/@irys/web-upload-solana@0.1.7/+esm'
-                    ], 'Irys Solana web adapter');
-
-                    if (typeof webUpload.WebUploader !== 'function') {
-                        throw new Error('Irys web-upload module did not expose WebUploader.');
-                    }
-                    if (typeof solanaUpload.WebSolana !== 'function') {
-                        throw new Error('Irys Solana adapter did not expose WebSolana.');
-                    }
-
-                    return {
-                        WebUploader: webUpload.WebUploader,
-                        WebSolana: solanaUpload.WebSolana
-                    };
-                })().catch(error => {
-                    // Allow a later retry after a transient CDN/network failure.
-                    irysModulesPromise = null;
-                    throw error;
-                });
-            }
-            return irysModulesPromise;
-        }
+        // Browser-native Irys upload. The official @irys/web-upload CDN bundles pull
+        // Node.js stream polyfills (unenv PassThrough) that throw in the browser.
+        const IRYS_DEVNET_URL = 'https://devnet.irys.xyz';
+        const IRYS_GATEWAY_URL = 'https://gateway.irys.xyz';
+        const IRYS_FREE_BYTE_LIMIT = 100 * 1024;
+        const IRYS_SOLANA_SIGNATURE_TYPE = 4;
+        const IRYS_SOLANA_SIGNATURE_LENGTH = 64;
+        const IRYS_SOLANA_OWNER_LENGTH = 32;
 
         // Intro Screen Timer
         setTimeout(() => {
@@ -2769,60 +2727,373 @@ ${errors.join('\n')}`);
             }
         });
 
-        // --- Irys-backed token launch preparation ---
-        // The image is uploaded only when the user presses Launch Token. Irys uses
-        // the currently connected wallet provider to request the required signature.
-        let irysUploader = null;
-        let irysUploaderAddress = null;
+        // --- Browser-native Irys Devnet upload (ANS-104 + bundler REST) ---
+        // Avoids the @irys/web-upload CDN path that throws:
+        // "[unenv] PassThrough is not implemented yet!"
+        const textEncoder = new TextEncoder();
 
-        async function getIrysUploader() {
+        function concatBytes(parts) {
+            const total = parts.reduce((sum, part) => sum + part.byteLength, 0);
+            const out = new Uint8Array(total);
+            let offset = 0;
+            for (const part of parts) {
+                out.set(part, offset);
+                offset += part.byteLength;
+            }
+            return out;
+        }
+
+        function u16le(value) {
+            const bytes = new Uint8Array(2);
+            new DataView(bytes.buffer).setUint16(0, value, true);
+            return bytes;
+        }
+
+        function u64le(value) {
+            const bytes = new Uint8Array(8);
+            new DataView(bytes.buffer).setBigUint64(0, BigInt(value), true);
+            return bytes;
+        }
+
+        function encodeAvroLong(value) {
+            let zigzag = (BigInt(value) << 1n) ^ (BigInt(value) >> 63n);
+            const out = [];
+            while (zigzag >= 0x80n) {
+                out.push(Number(zigzag & 0x7fn) | 0x80);
+                zigzag >>= 7n;
+            }
+            out.push(Number(zigzag));
+            return Uint8Array.from(out);
+        }
+
+        function encodeAvroString(value) {
+            const bytes = textEncoder.encode(value);
+            return concatBytes([encodeAvroLong(bytes.byteLength), bytes]);
+        }
+
+        function serializeAns104Tags(tags) {
+            if (!tags.length) return new Uint8Array(0);
+            const parts = [encodeAvroLong(tags.length)];
+            for (const tag of tags) {
+                parts.push(encodeAvroString(tag.name));
+                parts.push(encodeAvroString(tag.value));
+            }
+            parts.push(encodeAvroLong(0));
+            return concatBytes(parts);
+        }
+
+        async function sha384(bytes) {
+            return new Uint8Array(await crypto.subtle.digest('SHA-384', bytes));
+        }
+
+        async function sha256(bytes) {
+            return new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+        }
+
+        async function deepHash(chunk) {
+            if (Array.isArray(chunk)) {
+                const tag = concatBytes([textEncoder.encode('list'), textEncoder.encode(String(chunk.length))]);
+                let acc = await sha384(tag);
+                for (const item of chunk) {
+                    acc = await sha384(concatBytes([acc, await deepHash(item)]));
+                }
+                return acc;
+            }
+            const bytes = chunk instanceof Uint8Array ? chunk : textEncoder.encode(String(chunk));
+            const tag = concatBytes([textEncoder.encode('blob'), textEncoder.encode(String(bytes.byteLength))]);
+            return sha384(concatBytes([tag, bytes]));
+        }
+
+        function toBase64Url(bytes) {
+            let binary = '';
+            const chunkSize = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+            }
+            return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+        }
+
+        function bytesToHex(bytes) {
+            let hex = '';
+            for (let i = 0; i < bytes.length; i += 1) {
+                hex += bytes[i].toString(16).padStart(2, '0');
+            }
+            return hex;
+        }
+
+        function publicKeyToBytes(publicKey) {
+            if (!publicKey) throw new Error('Wallet public key is missing.');
+            if (typeof publicKey.toBytes === 'function') return publicKey.toBytes();
+            if (typeof publicKey.toBuffer === 'function') return new Uint8Array(publicKey.toBuffer());
+            if (publicKey.publicKey) return publicKeyToBytes(publicKey.publicKey);
+            return new solanaWeb3.PublicKey(publicKey.toString()).toBytes();
+        }
+
+        function normalizeSignatureBytes(signature) {
+            if (!signature) throw new Error('Wallet did not return a signature.');
+            if (signature instanceof Uint8Array) return signature;
+            if (signature instanceof ArrayBuffer) return new Uint8Array(signature);
+            if (Array.isArray(signature)) return Uint8Array.from(signature);
+            if (signature.signature) return normalizeSignatureBytes(signature.signature);
+            throw new Error('Unsupported wallet signature format.');
+        }
+
+        async function signIrysMessage(provider, message) {
+            if (!provider) throw new Error('Connect a Solana wallet before launching a token.');
+
+            const attempts = [];
+            if (typeof provider.signMessage === 'function') {
+                attempts.push(() => provider.signMessage(message, 'hex'));
+                attempts.push(() => provider.signMessage(message, { display: 'hex' }));
+                attempts.push(() => provider.signMessage(message));
+            }
+            if (provider.signMessage && provider.publicKey && typeof provider.signMessage !== 'function') {
+                // no-op guard
+            }
+
+            let lastError = null;
+            for (const attempt of attempts) {
+                try {
+                    const signed = await attempt();
+                    const bytes = normalizeSignatureBytes(signed);
+                    if (bytes.byteLength === IRYS_SOLANA_SIGNATURE_LENGTH) return bytes;
+                    lastError = new Error(`Wallet signature was ${bytes.byteLength} bytes, expected ${IRYS_SOLANA_SIGNATURE_LENGTH}.`);
+                } catch (error) {
+                    lastError = error;
+                }
+            }
+
+            throw lastError || new Error('The connected wallet does not support message signing required by Irys.');
+        }
+
+        async function createSignedSolanaDataItem(dataBytes, tags, ownerBytes, provider) {
+            const rawTags = serializeAns104Tags(tags);
+            const rawTarget = new Uint8Array(0);
+            const rawAnchor = new Uint8Array(0);
+
+            const signatureData = await deepHash([
+                textEncoder.encode('dataitem'),
+                textEncoder.encode('1'),
+                textEncoder.encode(String(IRYS_SOLANA_SIGNATURE_TYPE)),
+                ownerBytes,
+                rawTarget,
+                rawAnchor,
+                rawTags,
+                dataBytes
+            ]);
+
+            // HexInjectedSolanaSigner signs the UTF-8 bytes of the hex-encoded deep hash.
+            const hexMessage = textEncoder.encode(bytesToHex(signatureData));
+            const signature = await signIrysMessage(provider, hexMessage);
+            const id = toBase64Url(await sha256(signature));
+
+            const item = concatBytes([
+                u16le(IRYS_SOLANA_SIGNATURE_TYPE),
+                signature,
+                ownerBytes,
+                new Uint8Array([0]), // no target
+                new Uint8Array([0]), // no anchor
+                u64le(tags.length),
+                u64le(rawTags.byteLength),
+                rawTags,
+                dataBytes
+            ]);
+
+            return { id, signature, item };
+        }
+
+        async function postIrysDataItem(itemBytes) {
+            const endpoints = [
+                `${IRYS_DEVNET_URL}/tx/solana`,
+                `${IRYS_DEVNET_URL}/tx`
+            ];
+
+            let lastError = null;
+            for (const url of endpoints) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/octet-stream' },
+                        body: itemBytes
+                    });
+                    const text = await response.text();
+                    if (!response.ok) {
+                        lastError = new Error(`${response.status} ${text || response.statusText}`);
+                        if (response.status === 402) throw lastError;
+                        continue;
+                    }
+                    try {
+                        return JSON.parse(text);
+                    } catch (_) {
+                        return { id: text };
+                    }
+                } catch (error) {
+                    lastError = error;
+                    if (String(error?.message || error).includes('402')) throw error;
+                }
+            }
+            throw lastError || new Error('Irys Devnet did not accept the upload.');
+        }
+
+        async function getIrysDevnetInfo() {
+            const response = await fetch(`${IRYS_DEVNET_URL}/info`);
+            if (!response.ok) throw new Error('Unable to read Irys Devnet bundler info.');
+            return response.json();
+        }
+
+        async function getIrysSolanaBalance(address) {
+            const response = await fetch(`${IRYS_DEVNET_URL}/account/balance/solana?address=${encodeURIComponent(address)}`);
+            if (!response.ok) return 0n;
+            const payload = await response.json();
+            return BigInt(payload?.balance ?? payload ?? 0);
+        }
+
+        async function getIrysUploadPrice(byteCount) {
+            const response = await fetch(`${IRYS_DEVNET_URL}/price/solana/${byteCount}`);
+            if (!response.ok) throw new Error('Unable to quote an Irys Devnet upload price.');
+            const payload = await response.text();
+            return BigInt(String(payload).replace(/[^\d]/g, '') || '0');
+        }
+
+        async function fundIrysDevnetIfNeeded(byteCount) {
+            if (byteCount <= IRYS_FREE_BYTE_LIMIT) return;
+
+            const address = activePublicKey.toString();
+            const [price, balance, info] = await Promise.all([
+                getIrysUploadPrice(byteCount),
+                getIrysSolanaBalance(address),
+                getIrysDevnetInfo()
+            ]);
+
+            if (balance >= price) return;
+
+            const bundlerAddress = info?.addresses?.solana;
+            if (!bundlerAddress) {
+                throw new Error('Irys Devnet did not return a Solana funding address.');
+            }
+
+            const needed = price - balance;
+            const lamports = needed + (needed / 5n) + 5000n; // 20% buffer + fee cushion
+            const transaction = new solanaWeb3.Transaction().add(
+                solanaWeb3.SystemProgram.transfer({
+                    fromPubkey: activePublicKey,
+                    toPubkey: new solanaWeb3.PublicKey(bundlerAddress),
+                    lamports: Number(lamports)
+                })
+            );
+            transaction.feePayer = activePublicKey;
+            transaction.recentBlockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
+
+            let signature;
+            if (typeof activeProvider.signAndSendTransaction === 'function') {
+                const sent = await activeProvider.signAndSendTransaction(transaction);
+                signature = sent?.signature || sent;
+            } else if (typeof activeProvider.signTransaction === 'function') {
+                const signed = await activeProvider.signTransaction(transaction);
+                signature = await connection.sendRawTransaction(signed.serialize());
+            } else {
+                throw new Error('The connected wallet cannot send the Irys funding transaction.');
+            }
+
+            await connection.confirmTransaction(signature, 'confirmed');
+
+            const notify = await fetch(`${IRYS_DEVNET_URL}/account/balance/solana`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tx_id: signature })
+            });
+            if (!notify.ok) {
+                console.warn('Irys funding notification failed:', await notify.text());
+            }
+        }
+
+        async function prepareImageBytesForIrys(file) {
+            const original = new Uint8Array(await file.arrayBuffer());
+            if (original.byteLength <= IRYS_FREE_BYTE_LIMIT) {
+                return {
+                    bytes: original,
+                    contentType: file.type || 'application/octet-stream'
+                };
+            }
+
+            // Keep token images inside Irys' free 100 KiB tier when possible.
+            const objectUrl = URL.createObjectURL(file);
+            try {
+                const image = await new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject(new Error('Unable to read the token image for compression.'));
+                    img.src = objectUrl;
+                });
+
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                let width = image.naturalWidth || image.width;
+                let height = image.naturalHeight || image.height;
+                let quality = 0.9;
+
+                for (let attempt = 0; attempt < 8; attempt += 1) {
+                    canvas.width = Math.max(32, Math.round(width));
+                    canvas.height = Math.max(32, Math.round(height));
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+                    if (blob && blob.size <= IRYS_FREE_BYTE_LIMIT) {
+                        return {
+                            bytes: new Uint8Array(await blob.arrayBuffer()),
+                            contentType: 'image/jpeg'
+                        };
+                    }
+                    quality -= 0.1;
+                    width *= 0.82;
+                    height *= 0.82;
+                }
+            } finally {
+                URL.revokeObjectURL(objectUrl);
+            }
+
+            return {
+                bytes: original,
+                contentType: file.type || 'application/octet-stream'
+            };
+        }
+
+        async function uploadTokenImageToIrys(file) {
             if (!activeProvider || !activePublicKey) {
                 throw new Error('Connect a Solana wallet before launching a token.');
             }
 
-            // Rebuild when the connected provider/account changes.
-            if (irysUploader && irysUploaderAddress === activePublicKey.toString()) {
-                return irysUploader;
-            }
-
-            const { WebUploader, WebSolana } = await loadIrysModules();
-            if (typeof WebUploader !== 'function' || typeof WebSolana !== 'function') {
-                throw new Error('Irys browser modules loaded without the expected Solana uploader exports.');
-            }
-
-            const builder = WebUploader(WebSolana).withProvider(activeProvider);
-            if (typeof builder.withRpc !== 'function' || typeof builder.devnet !== 'function') {
-                throw new Error('The Irys browser SDK loaded, but its Devnet builder API is unavailable.');
-            }
-            irysUploader = await builder
-                .withRpc(DEVNET_RPC)
-                .devnet();
-
-            irysUploaderAddress = activePublicKey.toString();
-            return irysUploader;
-        }
-
-        async function uploadTokenImageToIrys(file) {
-            const uploader = await getIrysUploader();
-
-            // Irys automatically handles the file content type, but explicitly tagging
-            // it makes the resulting gateway URL reliably render as an image.
+            const prepared = await prepareImageBytesForIrys(file);
             const tags = [
                 { name: 'application-id', value: 'ConfluenceTokenLaunch' },
-                { name: 'Content-Type', value: file.type || 'application/octet-stream' }
+                { name: 'Content-Type', value: prepared.contentType },
+                { name: 'App-Name', value: 'CONFLUENCE' }
             ];
 
-            // Browser uploads are signed by the wallet provider passed above.
-            const receipt = await uploader.upload(file, { tags });
+            await fundIrysDevnetIfNeeded(prepared.bytes.byteLength);
 
-            if (!receipt?.id) {
+            const ownerBytes = publicKeyToBytes(activePublicKey);
+            if (ownerBytes.byteLength !== IRYS_SOLANA_OWNER_LENGTH) {
+                throw new Error('Connected wallet public key is not a 32-byte Solana key.');
+            }
+
+            const signed = await createSignedSolanaDataItem(
+                prepared.bytes,
+                tags,
+                ownerBytes,
+                activeProvider
+            );
+
+            const receipt = await postIrysDataItem(signed.item);
+            const id = receipt?.id || signed.id;
+            if (!id) {
                 throw new Error('Irys upload completed without a transaction ID.');
             }
 
             return {
-                id: receipt.id,
-                url: `https://gateway.irys.xyz/${receipt.id}`,
-                signature: receipt.signature || null
+                id,
+                url: `${IRYS_GATEWAY_URL}/${id}`,
+                signature: toBase64Url(signed.signature)
             };
         }
 
@@ -2856,7 +3127,7 @@ ${errors.join('\n')}`);
                 return;
             }
 
-            setLaunchButtonBusy(true, 'Uploading Image…');
+            setLaunchButtonBusy(true, 'Signing Irys Upload…');
 
             try {
                 const uploadedImage = await uploadTokenImageToIrys(selectedTokenImageFile);
@@ -3117,10 +3388,6 @@ ${errors.join('\n')}`);
                         publicKey :
                         new solanaWeb3.PublicKey(publicKey.toString());
 
-                    // Force Irys to bind to the newly selected wallet account.
-                    irysUploader = null;
-                    irysUploaderAddress = null;
-
                     const { solBalance, usdcBalance } = await fetchWalletBalances(activePublicKey);
                     applyWalletSession({
                         name: activeWalletName || 'Wallet',
@@ -3150,8 +3417,6 @@ ${errors.join('\n')}`);
 
             activeProvider = provider;
             activeWalletName = walletName;
-            irysUploader = null;
-            irysUploaderAddress = null;
             activePublicKey = publicKeyValue instanceof solanaWeb3.PublicKey ?
                 publicKeyValue :
                 new solanaWeb3.PublicKey(publicKeyValue.toString());
@@ -3281,8 +3546,6 @@ ${errors.join('\n')}`);
             activeProvider = null;
             activeWalletName = null;
             activePublicKey = null;
-            irysUploader = null;
-            irysUploaderAddress = null;
             localStorage.removeItem(WALLET_CONNECTED_FLAG);
 
             resetWalletUI();
